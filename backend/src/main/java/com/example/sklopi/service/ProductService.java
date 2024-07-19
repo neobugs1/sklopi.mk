@@ -21,15 +21,24 @@ public class ProductService {
         return productRepository.findById(id).orElse(null);
     }
 
-    public void save(Product product) {
-        productRepository.save(product);
-    }
-
-    public Optional<Product> findByName(String name) {
-        return productRepository.findByName(name);
+    public Product saveProduct(Product product) {
+        Optional<Product> existingProduct = productRepository.findByName(product.getName());
+        if (existingProduct.isPresent()) {
+            Product existing = existingProduct.get();
+            existing.setPrice(product.getPrice());
+            existing.setImageUrl(product.getImageUrl());
+            existing.setProductUrl(product.getProductUrl());
+            return productRepository.save(existing);
+        } else {
+            return productRepository.save(product);
+        }
     }
 
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
+    }
+
+    public Optional<Product> findByName(String name) {
+        return productRepository.findByName(name);
     }
 }

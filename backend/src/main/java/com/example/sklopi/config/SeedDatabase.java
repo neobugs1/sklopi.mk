@@ -2,81 +2,76 @@ package com.example.sklopi.config;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.PartModel;
-import com.example.sklopi.repository.PartModelRepository;
-import com.example.sklopi.repository.PartRepository;
+import com.example.sklopi.service.PartModelService;
+import com.example.sklopi.service.PartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+@Order(1)
 @Component
 public class SeedDatabase implements CommandLineRunner {
 
     @Autowired
-    private PartRepository partRepository;
+    private PartService partService;
 
     @Autowired
-    private PartModelRepository partModelRepository;
+    private PartModelService partModelService;
 
     @Override
     public void run(String... args) throws Exception {
-        seedPartsAndPartModels();
+        seedParts();
+        seedGPUModels();
     }
 
-    private void seedPartsAndPartModels() {
-        // Create parts
-        Part gpu = new Part();
-        gpu.setName("GPU");
-        partRepository.save(gpu);
+    private void seedParts() {
+        List<String> partNames = Arrays.asList(
+                "CPU", "CPU Cooler", "Motherboard", "RAM", "Storage",
+                "PSU", "Case", "GPU"
+        );
 
-        Part cpu = new Part();
-        cpu.setName("CPU");
-        partRepository.save(cpu);
+        for (String partName : partNames) {
+            Optional<Part> partOptional = partService.findByName(partName);
+            if (partOptional.isEmpty()) {
+                Part part = new Part();
+                part.setName(partName);
+                partService.savePart(part);
+            }
+        }
+    }
 
-        Part cooler = new Part();
-        cooler.setName("Cooler");
-        partRepository.save(cooler);
+    private void seedGPUModels() {
+        Optional<Part> gpuOptional = partService.findByName("GPU");
+        if (gpuOptional.isPresent()) {
+            Part gpu = gpuOptional.get();
+            String[] gpuModels = {
+                    "RTX 3050", "RTX 3060", "RTX 3090 Ti",
+                    "RTX 4060", "RTX 4060 Ti", "RTX 4070",
+                    "RTX 4070 SUPER", "RTX 4070 Ti", "RTX 4070 Ti SUPER",
+                    "RTX 4080", "RTX 4080 SUPER", "RTX 4090",
+                    "RX 6500 XT", "RX 6600", "RX 6600 XT",
+                    "RX 6700 XT", "RX 6800", "RX 6800 XT",
+                    "RX 6900 XT", "RX 7600 XT", "RX 7700 XT",
+                    "RX 7800 XT", "RX 7900 GRE", "RX 7900 XT",
+                    "RX 7900 XTX"
+            };
 
-        Part psu = new Part();
-        psu.setName("PSU");
-        partRepository.save(psu);
-
-        Part motherboard = new Part();
-        motherboard.setName("Motherboard");
-        partRepository.save(motherboard);
-
-        Part memory = new Part();
-        memory.setName("Memory");
-        partRepository.save(memory);
-
-        Part ram = new Part();
-        ram.setName("RAM");
-        partRepository.save(ram);
-
-        Part casePart = new Part();
-        casePart.setName("Case");
-        partRepository.save(casePart);
-
-        // Create GPU part models
-        PartModel rtx3060Ti = new PartModel();
-        rtx3060Ti.setName("RTX 3060 Ti");
-        rtx3060Ti.setPart(gpu);
-        partModelRepository.save(rtx3060Ti);
-
-        PartModel rtx3070 = new PartModel();
-        rtx3070.setName("RTX 3070");
-        rtx3070.setPart(gpu);
-        partModelRepository.save(rtx3070);
-
-        PartModel gtx1650 = new PartModel();
-        gtx1650.setName("GTX 1650");
-        gtx1650.setPart(gpu);
-        partModelRepository.save(gtx1650);
-
-        PartModel rx7600 = new PartModel();
-        rx7600.setName("RX 7600");
-        rx7600.setPart(gpu);
-        partModelRepository.save(rx7600);
-
-        System.out.println("Database seeded successfully.");
+            for (String modelName : gpuModels) {
+                Optional<PartModel> modelOptional = partModelService.findByNameAndPart(modelName, gpu);
+                if (modelOptional.isEmpty()) {
+                    PartModel model = new PartModel();
+                    model.setName(modelName);
+                    model.setPart(gpu);
+                    partModelService.savePartModel(model);
+                }
+            }
+        } else {
+            System.err.println("GPU part not found, models cannot be seeded.");
+        }
     }
 }

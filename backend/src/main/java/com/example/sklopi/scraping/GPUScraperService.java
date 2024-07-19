@@ -3,10 +3,6 @@ package com.example.sklopi.scraping;
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.PartModel;
 import com.example.sklopi.model.Product;
-import com.example.sklopi.repository.PartModelRepository;
-import com.example.sklopi.repository.PartRepository;
-import com.example.sklopi.repository.ProductRepository;
-
 import com.example.sklopi.service.PartModelService;
 import com.example.sklopi.service.PartService;
 import com.example.sklopi.service.ProductService;
@@ -20,8 +16,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,8 +56,7 @@ public class GPUScraperService {
                 Part gpuPart = partService.findByName("GPU").orElseGet(() -> {
                     Part newPart = new Part();
                     newPart.setName("GPU");
-                    partService.savePart(newPart);
-                    return newPart;
+                    return partService.savePart(newPart);
                 });
 
                 for (WebElement gpuElement : gpuElements) {
@@ -76,27 +71,12 @@ public class GPUScraperService {
                     int price = Integer.parseInt(cleanedPriceString);
 
                     // Determine the part model
-                    String partModelName = determinePartModelName(name);
+                    Optional<PartModel> partModelOptional = determinePartModel(name, gpuPart);
 
-                    PartModel partModel = partModelService.findByNameAndPart(partModelName, gpuPart)
-                            .orElseGet(() -> {
-                                PartModel newPartModel = new PartModel();
-                                newPartModel.setName(partModelName);
-                                newPartModel.setPart(gpuPart);
-                                partModelService.savePartModel(newPartModel);
-                                return newPartModel;
-                            });
+                    if (partModelOptional.isPresent()) {
+                        PartModel partModel = partModelOptional.get();
 
-                    // Check if the product already exists
-                    Optional<Product> existingProduct = productService.findByName(name);
-                    if (existingProduct.isPresent()) {
-                        Product product = existingProduct.get();
-                        product.setPrice(price);
-                        product.setImageUrl(imageUrl);
-                        product.setProductUrl(productUrl);
-                        productService.save(product);
-                        System.out.println("Updated product: " + name);
-                    } else {
+                        // Save or update product
                         Product product = new Product();
                         product.setName(name);
                         product.setImageUrl(imageUrl);
@@ -104,8 +84,10 @@ public class GPUScraperService {
                         product.setPrice(price);
                         product.setPart(gpuPart);
                         product.setPartModel(partModel);
-                        productService.save(product);
-                        System.out.println("Saved product: " + name);
+                        productService.saveProduct(product);
+                        System.out.println("Processed product: " + name);
+                    } else {
+                        System.out.println("Skipped product (unknown model): " + name);
                     }
                 }
             }
@@ -116,16 +98,17 @@ public class GPUScraperService {
         }
     }
 
-    private String determinePartModelName(String productName) {
-        if (productName.contains("RTX 3060 Ti")) {
-            return "RTX 3060 Ti";
-        } else if (productName.contains("RTX 3070")) {
-            return "RTX 3070";
-        } else if (productName.contains("GTX 1650")) {
-            return "GTX 1650";
-        } else if (productName.contains("RX 7600")) {
-            return "RX 7600";
+    private Optional<PartModel> determinePartModel(String productName, Part gpuPart) {
+        List<PartModel> partModels = partModelService.findByPart(gpuPart);
+
+        // Sort part models by length in descending order
+        partModels.sort(Comparator.comparingInt((PartModel model) -> model.getName().length()).reversed());
+
+        for (PartModel model : partModels) {
+            if (productName.contains(model.getName())) {
+                return Optional.of(model);
+            }
         }
-        return "Unknown Model";
+        return Optional.empty();
     }
 }

@@ -23,7 +23,12 @@ public class PartModelService {
     }
 
     public PartModel savePartModel(PartModel partModel) {
-        return partModelRepository.save(partModel);
+        Optional<PartModel> existingPartModel = partModelRepository.findByNameAndPart(partModel.getName(), partModel.getPart());
+        if (existingPartModel.isPresent()) {
+            return existingPartModel.get();
+        } else {
+            return partModelRepository.save(partModel);
+        }
     }
 
     public void deletePartModel(Long id) {
@@ -32,5 +37,9 @@ public class PartModelService {
 
     public Optional<PartModel> findByNameAndPart(String name, Part part) {
         return partModelRepository.findByNameAndPart(name, part);
+    }
+
+    public List<PartModel> findByPart(Part part) {
+        return partModelRepository.findByPart(part);
     }
 }

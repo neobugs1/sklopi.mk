@@ -22,7 +22,12 @@ public class PartService {
     }
 
     public Part savePart(Part part) {
-        return partRepository.save(part);
+        Optional<Part> existingPart = partRepository.findByName(part.getName());
+        if (existingPart.isPresent()) {
+            return existingPart.get();
+        } else {
+            return partRepository.save(part);
+        }
     }
 
     public void deletePart(Long id) {
