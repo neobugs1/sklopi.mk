@@ -1,11 +1,13 @@
 package com.example.sklopi.service;
 
+import com.example.sklopi.model.Part;
 import com.example.sklopi.model.PartModel;
 import com.example.sklopi.repository.PartModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PartModelService {
@@ -26,5 +28,9 @@ public class PartModelService {
 
     public void deletePartModel(Long id) {
         partModelRepository.deleteById(id);
+    }
+
+    public Optional<PartModel> findByNameAndPart(String name, Part part) {
+        return partModelRepository.findByNameAndPart(name, part);
     }
 }

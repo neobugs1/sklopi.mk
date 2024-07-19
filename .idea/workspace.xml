@@ -48,7 +48,7 @@
     "Spring Boot.SklopiApplication.executor": "Run",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Nikola/Downloads/k/sklopi/sklopi.mk/backend",
+    "last_opened_file_path": "C:/Users/Nikola/Downloads/k/sklopi",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -88,6 +88,7 @@
       <workItem from="1721336510991" duration="39000" />
       <workItem from="1721336580514" duration="35000" />
       <workItem from="1721338908595" duration="9000" />
+      <workItem from="1721339065232" duration="628000" />
     </task>
     <servers />
   </component>

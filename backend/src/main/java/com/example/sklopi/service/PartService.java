@@ -4,7 +4,9 @@ import com.example.sklopi.model.Part;
 import com.example.sklopi.repository.PartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PartService {
@@ -25,5 +27,9 @@ public class PartService {
 
     public void deletePart(Long id) {
         partRepository.deleteById(id);
+    }
+
+    public Optional<Part> findByName(String name) {
+        return partRepository.findByName(name);
     }
 }

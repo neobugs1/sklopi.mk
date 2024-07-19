@@ -23,16 +23,16 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        return productService.saveProduct(product);
-    }
-
-    @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
+//    @PostMapping
+//    public Product createProduct(@RequestBody Product product) {
+//        return productService.save(product);
+//    }
+//
+//    @PutMapping("/{id}")
+//    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
 //        product.setId(id);
-        return productService.saveProduct(product);
-    }
+//        return productService.save(product);
+//    }
 
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {

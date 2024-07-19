@@ -30,7 +30,7 @@ public class PartController {
 
     @PutMapping("/{id}")
     public Part updatePart(@PathVariable Long id, @RequestBody Part part) {
-//        part.setId(id);
+        part.setId(id);
         return partService.savePart(part);
     }
 
