@@ -1,11 +1,13 @@
 package com.example.sklopi.scraping;
 
 import com.example.sklopi.model.Part;
+import com.example.sklopi.model.PriceHistory;
 import com.example.sklopi.model.Product;
 import com.example.sklopi.model.parts.GPU;
 import com.example.sklopi.service.PartService;
 import com.example.sklopi.service.ProductService;
 import com.example.sklopi.service.parts.GPUService;
+import com.example.sklopi.repository.PriceHistoryRepository;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +35,9 @@ public class GPUScraperService {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private PriceHistoryRepository priceHistoryRepository;
 
     public void scrapeAndSaveGPUs() {
         System.setProperty("webdriver.chrome.driver", "C:\\ChromeDriver\\chromedriver.exe");
@@ -52,7 +58,6 @@ public class GPUScraperService {
             if (gpuElements.isEmpty()) {
                 System.out.println("No elements found with the selector .product-card");
             } else {
-                // Ensure GPU part exists
                 Part gpuPart = partService.findByName("GPU").orElseGet(() -> {
                     Part newPart = new Part();
                     newPart.setName("GPU");
@@ -70,13 +75,11 @@ public class GPUScraperService {
                     String cleanedPriceString = priceString.replace(" ден.", "").replace(".", "").split(",")[0];
                     int price = Integer.parseInt(cleanedPriceString);
 
-                    // Determine the part model
                     Optional<GPU> partModelOptional = determinePartModel(name, gpuPart);
 
                     if (partModelOptional.isPresent()) {
                         GPU partModel = partModelOptional.get();
 
-                        // Save or update product
                         Product product = new Product();
                         product.setName(name);
                         product.setImageUrl(imageUrl);
@@ -84,8 +87,9 @@ public class GPUScraperService {
                         product.setPrice(price);
                         product.setPart(gpuPart);
                         product.setPartModel(partModel);
+
                         productService.saveProduct(product);
-                        System.out.println("Processed product: " + name);
+                        System.out.println("Processed product: " + name + " with price: " + price);
                     } else {
                         System.out.println("Skipped product (unknown model): " + name);
                     }

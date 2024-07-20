@@ -1,5 +1,6 @@
 package com.example.sklopi.service;
 
+import com.example.sklopi.model.PartModel;
 import com.example.sklopi.model.Product;
 import com.example.sklopi.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProductService {
@@ -21,15 +23,18 @@ public class ProductService {
         return productRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     public Product saveProduct(Product product) {
-        Optional<Product> existingProduct = productRepository.findByName(product.getName());
-        if (existingProduct.isPresent()) {
-            Product existing = existingProduct.get();
-            existing.setPrice(product.getPrice());
-            existing.setImageUrl(product.getImageUrl());
-            existing.setProductUrl(product.getProductUrl());
-            return productRepository.save(existing);
+        Optional<Product> existingProductOptional = productRepository.findByProductUrl(product.getProductUrl());
+        if (existingProductOptional.isPresent()) {
+            Product existingProduct = existingProductOptional.get();
+            existingProduct.setName(product.getName());
+            existingProduct.setImageUrl(product.getImageUrl());
+            existingProduct.setPrice(product.getPrice());
+            existingProduct.addPriceHistory(product.getPrice());
+            return productRepository.save(existingProduct);
         } else {
+            product.addPriceHistory(product.getPrice());
             return productRepository.save(product);
         }
     }
@@ -41,4 +46,13 @@ public class ProductService {
     public Optional<Product> findByName(String name) {
         return productRepository.findByName(name);
     }
+
+    public Optional<Product> findByNameAndPartModel(String name, PartModel partModel) {
+        return productRepository.findByNameAndPartModel(name, partModel);
+    }
+
+    public Optional<Product> findByProductUrl(String productUrl) {
+        return productRepository.findByProductUrl(productUrl);
+    }
 }
+
