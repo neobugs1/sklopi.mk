@@ -1,11 +1,11 @@
 package com.example.sklopi.scraping;
 
 import com.example.sklopi.model.Part;
-import com.example.sklopi.model.PartModel;
 import com.example.sklopi.model.Product;
-import com.example.sklopi.service.PartModelService;
+import com.example.sklopi.model.parts.GPU;
 import com.example.sklopi.service.PartService;
 import com.example.sklopi.service.ProductService;
+import com.example.sklopi.service.parts.GPUService;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -28,7 +28,7 @@ public class GPUScraperService {
     private PartService partService;
 
     @Autowired
-    private PartModelService partModelService;
+    private GPUService gpuService;
 
     @Autowired
     private ProductService productService;
@@ -71,10 +71,10 @@ public class GPUScraperService {
                     int price = Integer.parseInt(cleanedPriceString);
 
                     // Determine the part model
-                    Optional<PartModel> partModelOptional = determinePartModel(name, gpuPart);
+                    Optional<GPU> partModelOptional = determinePartModel(name, gpuPart);
 
                     if (partModelOptional.isPresent()) {
-                        PartModel partModel = partModelOptional.get();
+                        GPU partModel = partModelOptional.get();
 
                         // Save or update product
                         Product product = new Product();
@@ -98,13 +98,13 @@ public class GPUScraperService {
         }
     }
 
-    private Optional<PartModel> determinePartModel(String productName, Part gpuPart) {
-        List<PartModel> partModels = partModelService.findByPart(gpuPart);
+    private Optional<GPU> determinePartModel(String productName, Part gpuPart) {
+        List<GPU> partModels = gpuService.findAll();
 
         // Sort part models by length in descending order
-        partModels.sort(Comparator.comparingInt((PartModel model) -> model.getName().length()).reversed());
+        partModels.sort(Comparator.comparingInt((GPU model) -> model.getName().length()).reversed());
 
-        for (PartModel model : partModels) {
+        for (GPU model : partModels) {
             if (productName.contains(model.getName())) {
                 return Optional.of(model);
             }

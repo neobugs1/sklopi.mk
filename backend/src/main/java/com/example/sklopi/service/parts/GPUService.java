@@ -1,31 +1,31 @@
 package com.example.sklopi.service.parts;
 
+import com.example.sklopi.model.Part;
 import com.example.sklopi.model.parts.GPU;
 import com.example.sklopi.repository.parts.GPURepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GPUService {
+
     @Autowired
     private GPURepository gpuRepository;
 
-    public List<GPU> getAllGPUs() {
-        return gpuRepository.findAll();
+    public Optional<GPU> findByNameAndPart(String name, Part part) {
+        return gpuRepository.findByNameAndPart(name, part);
     }
 
-    public GPU getGPUById(Long id) {
-        return gpuRepository.findById(id).orElse(null);
-    }
-
-    public GPU saveGPU(GPU gpu) {
+    public GPU save(GPU gpu) {
         return gpuRepository.save(gpu);
     }
 
-    public void deleteGPU(Long id) {
-        gpuRepository.deleteById(id);
+    public List<GPU> findAll() {
+        return gpuRepository.findAll();
     }
 }
+
 
