@@ -23,12 +23,15 @@ public class SeedDatabase implements CommandLineRunner {
 
     @Autowired
     private SeedCPUs seedCPUs;
+    @Autowired
+    private SeedMotherboards seedMotherboards;
 
     @Override
     public void run(String... args) throws Exception {
         seedParts();
         seedGPUs.seedGPUModels();
         seedCPUs.seedCPUModels();
+        seedMotherboards.seedMotherboardModels();
     }
 
     private void seedParts() {
