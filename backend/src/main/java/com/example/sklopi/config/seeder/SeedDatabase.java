@@ -25,6 +25,8 @@ public class SeedDatabase implements CommandLineRunner {
     private SeedCPUs seedCPUs;
     @Autowired
     private SeedMotherboards seedMotherboards;
+    @Autowired
+    private SeedRAMs seedRAMs;
 
     @Override
     public void run(String... args) throws Exception {
@@ -32,6 +34,7 @@ public class SeedDatabase implements CommandLineRunner {
         seedGPUs.seedGPUModels();
         seedCPUs.seedCPUModels();
         seedMotherboards.seedMotherboardModels();
+        seedRAMs.seedRAMModels();
     }
 
     private void seedParts() {
