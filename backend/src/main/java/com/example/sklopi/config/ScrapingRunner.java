@@ -26,6 +26,10 @@ public class ScrapingRunner implements CommandLineRunner {
     private AirCoolerScraperService airCoolerScraperService;
     @Autowired
     private LiquidCoolerScraperService liquidCoolerScraperService;
+    @Autowired
+    private PSUScraperService psuScraperService;
+    @Autowired
+    private PcCaseScraperService pcCaseScraperService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -35,7 +39,9 @@ public class ScrapingRunner implements CommandLineRunner {
 //        ramScraperService.scrapeAndSaveRAMs();
 //        ssdScraperService.scrapeAndSaveSSDs();
 //        hddScraperService.scrapeAndSaveHDDs();
-        airCoolerScraperService.scrapeAndSaveAirCoolers();
-        liquidCoolerScraperService.scrapeAndSaveLiquidCoolers();
+//        airCoolerScraperService.scrapeAndSaveAirCoolers();
+//        liquidCoolerScraperService.scrapeAndSaveLiquidCoolers();
+//        psuScraperService.scrapeAndSavePSUs();
+        pcCaseScraperService.scrapeAndSaveCases();
     }
 }
