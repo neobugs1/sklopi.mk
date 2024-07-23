@@ -11,5 +11,4 @@ import java.util.Optional;
 @Repository
 public interface RAMRepository extends JpaRepository<RAM, Long> {
     Optional<RAM> findByNameAndPart(String name, Part part);
-
 }
