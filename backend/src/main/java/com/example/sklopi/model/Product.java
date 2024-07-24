@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +24,7 @@ public class Product {
     private String productUrl;
     private int price;
     private LocalDate lastUpdated;
+    private boolean inStock;
 
     @ManyToOne
     @JoinColumn(name = "part_id")
@@ -55,5 +55,4 @@ public class Product {
 
         System.out.println("Adding price history: " + price + " on " + LocalDate.now());
     }
-
 }

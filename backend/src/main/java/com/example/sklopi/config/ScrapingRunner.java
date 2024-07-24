@@ -1,6 +1,7 @@
 package com.example.sklopi.config;
 
 import com.example.sklopi.scraping.*;
+import com.example.sklopi.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -31,17 +32,22 @@ public class ScrapingRunner implements CommandLineRunner {
     @Autowired
     private PcCaseScraperService pcCaseScraperService;
 
+    @Autowired
+    private ProductService productService;
+
     @Override
     public void run(String... args) throws Exception {
-//        scraperService.scrapeAndSaveGPUs();
-//        cpuScraperService.scrapeAndSaveCPUs();
-//        motherboardScraperService.scrapeAndSaveMotherboards();
-//        ramScraperService.scrapeAndSaveRAMs();
-//        ssdScraperService.scrapeAndSaveSSDs();
-//        hddScraperService.scrapeAndSaveHDDs();
-//        airCoolerScraperService.scrapeAndSaveAirCoolers();
-//        liquidCoolerScraperService.scrapeAndSaveLiquidCoolers();
-//        psuScraperService.scrapeAndSavePSUs();
+        productService.setAllProductsOutOfStock();
+
+        scraperService.scrapeAndSaveGPUs();
+        cpuScraperService.scrapeAndSaveCPUs();
+        motherboardScraperService.scrapeAndSaveMotherboards();
+        ramScraperService.scrapeAndSaveRAMs();
+        ssdScraperService.scrapeAndSaveSSDs();
+        hddScraperService.scrapeAndSaveHDDs();
+        airCoolerScraperService.scrapeAndSaveAirCoolers();
+        liquidCoolerScraperService.scrapeAndSaveLiquidCoolers();
+        psuScraperService.scrapeAndSavePSUs();
         pcCaseScraperService.scrapeAndSaveCases();
     }
 }

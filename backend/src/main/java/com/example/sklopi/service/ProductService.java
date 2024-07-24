@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -25,6 +26,7 @@ public class ProductService {
 
     @Transactional
     public Product saveProduct(Product product) {
+        product.setInStock(true);
         Optional<Product> existingProductOptional = productRepository.findByProductUrl(product.getProductUrl());
         if (existingProductOptional.isPresent()) {
             Product existingProduct = existingProductOptional.get();
@@ -45,6 +47,17 @@ public class ProductService {
 
     public Optional<Product> findByName(String name) {
         return productRepository.findByName(name);
+    }
+
+    // figuring out product stock
+    public void setAllProductsOutOfStock() {
+        List<Product> allProducts = productRepository.findAll();
+        for (Product product : allProducts) {
+            if (product.isInStock()) {
+                product.setInStock(false);
+                productRepository.save(product);
+            }
+        }
     }
 
     public Optional<Product> findByNameAndPartModel(String name, PartModel partModel) {
