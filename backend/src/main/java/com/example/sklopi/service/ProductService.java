@@ -26,7 +26,6 @@ public class ProductService {
 
     @Transactional
     public Product saveProduct(Product product) {
-        product.setInStock(true);
         Optional<Product> existingProductOptional = productRepository.findByProductUrl(product.getProductUrl());
         if (existingProductOptional.isPresent()) {
             Product existingProduct = existingProductOptional.get();
@@ -34,9 +33,11 @@ public class ProductService {
             existingProduct.setImageUrl(product.getImageUrl());
             existingProduct.setPrice(product.getPrice());
             existingProduct.addPriceHistory(product.getPrice());
+            existingProduct.setInStock(true);
             return productRepository.save(existingProduct);
         } else {
             product.addPriceHistory(product.getPrice());
+            product.setInStock(true);
             return productRepository.save(product);
         }
     }

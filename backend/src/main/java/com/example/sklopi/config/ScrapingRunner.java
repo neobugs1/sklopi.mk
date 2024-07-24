@@ -39,15 +39,15 @@ public class ScrapingRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         productService.setAllProductsOutOfStock();
 
-        scraperService.scrapeAndSaveGPUs();
-        cpuScraperService.scrapeAndSaveCPUs();
-        motherboardScraperService.scrapeAndSaveMotherboards();
-        ramScraperService.scrapeAndSaveRAMs();
-        ssdScraperService.scrapeAndSaveSSDs();
-        hddScraperService.scrapeAndSaveHDDs();
-        airCoolerScraperService.scrapeAndSaveAirCoolers();
-        liquidCoolerScraperService.scrapeAndSaveLiquidCoolers();
-        psuScraperService.scrapeAndSavePSUs();
-        pcCaseScraperService.scrapeAndSaveCases();
+//        scraperService.scrapeAndSaveGPUs();
+//        cpuScraperService.scrapeAndSaveCPUs();
+//        motherboardScraperService.scrapeAndSaveMotherboards();
+//        ramScraperService.scrapeAndSaveRAMs();
+//        ssdScraperService.scrapeAndSaveSSDs();
+//        hddScraperService.scrapeAndSaveHDDs();
+//        airCoolerScraperService.scrapeAndSaveAirCoolers();
+//        liquidCoolerScraperService.scrapeAndSaveLiquidCoolers();
+//        psuScraperService.scrapeAndSavePSUs();
+//        pcCaseScraperService.scrapeAndSaveCases();
     }
 }

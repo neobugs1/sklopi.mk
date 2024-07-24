@@ -34,7 +34,7 @@ public class SeedDatabase implements CommandLineRunner {
         seedGPUs.seedGPUModels();
         seedCPUs.seedCPUModels();
         seedMotherboards.seedMotherboardModels();
-        seedRAMs.seedRAMModels();
+//        seedRAMs.seedRAMModels();
     }
 
     private void seedParts() {

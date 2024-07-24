@@ -44,7 +44,7 @@ public class MotherboardScraperService {
         try {
             driver.get("https://www.anhoch.com/categories/matichni-plochi/products?brand=&attribute=&toPrice=274980&inStockOnly=1&sort=latest&perPage=100&page=1");
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product-card")));
 
             List<WebElement> motherboardElements = driver.findElements(By.cssSelector(".product-card"));

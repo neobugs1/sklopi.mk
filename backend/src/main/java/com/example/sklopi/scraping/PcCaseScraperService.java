@@ -44,7 +44,7 @@ public class PcCaseScraperService {
         try {
             driver.get("https://www.anhoch.com/categories/kukjishta/products?brand=&attribute=&fromPrice=1200&toPrice=16970&inStockOnly=1&sort=priceLowToHigh&perPage=100&page=1");
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product-card")));
 
             List<WebElement> caseElements = driver.findElements(By.cssSelector(".product-card"));
