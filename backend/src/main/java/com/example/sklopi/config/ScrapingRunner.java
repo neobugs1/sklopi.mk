@@ -1,6 +1,7 @@
 package com.example.sklopi.config;
 
-import com.example.sklopi.scraping.*;
+import com.example.sklopi.scraping.anhoch.*;
+import com.example.sklopi.scraping.setec.SetecGPUScraperService;
 import com.example.sklopi.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -12,42 +13,35 @@ import org.springframework.stereotype.Component;
 public class ScrapingRunner implements CommandLineRunner {
 
     @Autowired
-    private GPUScraperService scraperService;
+    private AnhochGPUScraperService scraperService;
     @Autowired
-    private CPUScraperService cpuScraperService;
+    private AnhochCPUScraperService anhochCpuScraperService;
     @Autowired
-    private MotherboardScraperService motherboardScraperService;
+    private AnhochMotherboardScraperService anhochMotherboardScraperService;
     @Autowired
-    private RAMScraperService ramScraperService;
+    private AnhochRAMScraperService anhochRamScraperService;
     @Autowired
-    private SSDScraperService ssdScraperService;
+    private AnhochSSDScraperService anhochSsdScraperService;
     @Autowired
-    private HDDScraperService hddScraperService;
+    private AnhochHDDScraperService anhochHddScraperService;
     @Autowired
-    private AirCoolerScraperService airCoolerScraperService;
+    private AnhochAirCoolerScraperService anhochAirCoolerScraperService;
     @Autowired
-    private LiquidCoolerScraperService liquidCoolerScraperService;
+    private AnhochLiquidCoolerScraperService anhochLiquidCoolerScraperService;
     @Autowired
-    private PSUScraperService psuScraperService;
+    private AnhochPSUScraperService anhochPsuScraperService;
     @Autowired
-    private PcCaseScraperService pcCaseScraperService;
+    private AnhochPcCaseScraperService anhochPcCaseScraperService;
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private SetecGPUScraperService setecGPUScraperService;
 
     @Override
     public void run(String... args) throws Exception {
         productService.setAllProductsOutOfStock();
 
-//        scraperService.scrapeAndSaveGPUs();
-//        cpuScraperService.scrapeAndSaveCPUs();
-//        motherboardScraperService.scrapeAndSaveMotherboards();
-//        ramScraperService.scrapeAndSaveRAMs();
-//        ssdScraperService.scrapeAndSaveSSDs();
-//        hddScraperService.scrapeAndSaveHDDs();
-//        airCoolerScraperService.scrapeAndSaveAirCoolers();
-//        liquidCoolerScraperService.scrapeAndSaveLiquidCoolers();
-//        psuScraperService.scrapeAndSavePSUs();
-//        pcCaseScraperService.scrapeAndSaveCases();
+        setecGPUScraperService.scrapeAndSaveGPUs();
     }
 }

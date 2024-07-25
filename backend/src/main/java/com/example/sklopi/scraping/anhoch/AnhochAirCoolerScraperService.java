@@ -1,4 +1,4 @@
-package com.example.sklopi.scraping;
+package com.example.sklopi.scraping.anhoch;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.Product;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AirCoolerScraperService {
+public class AnhochAirCoolerScraperService {
 
     @Autowired
     private PartService partService;

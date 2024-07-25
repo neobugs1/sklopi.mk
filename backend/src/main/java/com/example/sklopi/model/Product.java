@@ -21,7 +21,10 @@ public class Product {
 
     private String name;
     private String imageUrl;
-    private String productUrl;
+
+    @Column(length = 1024)
+    private String productUrl; //potrebno e pogolema dolzina bidejki setec koristi kirilica vo URI
+
     private int price;
     private LocalDate lastUpdated;
     private boolean inStock;

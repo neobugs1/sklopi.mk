@@ -1,4 +1,4 @@
-package com.example.sklopi.scraping;
+package com.example.sklopi.scraping.anhoch;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.Product;
@@ -23,7 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class RAMScraperService {
+public class AnhochRAMScraperService {
 
     @Autowired
     private PartService partService;

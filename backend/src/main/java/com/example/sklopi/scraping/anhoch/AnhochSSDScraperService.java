@@ -1,4 +1,4 @@
-package com.example.sklopi.scraping;
+package com.example.sklopi.scraping.anhoch;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.Product;
@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class HDDScraperService {
+public class AnhochSSDScraperService {
 
     @Autowired
     private PartService partService;
@@ -35,7 +35,7 @@ public class HDDScraperService {
     @Autowired
     private ProductService productService;
 
-    public void scrapeAndSaveHDDs() {
+    public void scrapeAndSaveSSDs() {
         System.setProperty("webdriver.chrome.driver", "C:\\ChromeDriver\\chromedriver.exe");
 
         ChromeOptions options = new ChromeOptions();
@@ -44,30 +44,30 @@ public class HDDScraperService {
         WebDriver driver = new ChromeDriver(options);
 
         try {
-            driver.get("https://www.anhoch.com/categories/interni-hdd/products?brand=&attribute=&toPrice=274980&inStockOnly=1&sort=latest&perPage=100&page=1");
+            driver.get("https://www.anhoch.com/categories/interni-ssd/products?brand=&attribute=&toPrice=274980&inStockOnly=1&sort=latest&perPage=100&page=1");
 
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product-card")));
 
-            List<WebElement> hddElements = driver.findElements(By.cssSelector(".product-card"));
+            List<WebElement> ssdElements = driver.findElements(By.cssSelector(".product-card"));
 
-            if (hddElements.isEmpty()) {
+            if (ssdElements.isEmpty()) {
                 System.out.println("No elements found with the selector .product-card");
             } else {
                 List<String> knownBrands = scrapeBrands(driver);
 
-                Part hddPart = partService.findByName("Storage").orElseGet(() -> {
+                Part ssdPart = partService.findByName("Storage").orElseGet(() -> {
                     Part newPart = new Part();
                     newPart.setName("Storage");
                     return partService.savePart(newPart);
                 });
 
-                for (WebElement hddElement : hddElements) {
-                    String imageUrl = hddElement.findElement(By.cssSelector(".product-image img")).getAttribute("src");
-                    String productUrl = hddElement.findElement(By.cssSelector(".product-card-middle a")).getAttribute("href");
-                    String name = hddElement.findElement(By.cssSelector(".product-name h6")).getText();
+                for (WebElement ssdElement : ssdElements) {
+                    String imageUrl = ssdElement.findElement(By.cssSelector(".product-image img")).getAttribute("src");
+                    String productUrl = ssdElement.findElement(By.cssSelector(".product-card-middle a")).getAttribute("href");
+                    String name = ssdElement.findElement(By.cssSelector(".product-name h6")).getText();
 
-                    WebElement priceElement = hddElement.findElement(By.cssSelector(".product-card-bottom div"));
+                    WebElement priceElement = ssdElement.findElement(By.cssSelector(".product-card-bottom div"));
                     String priceString = priceElement.getText().trim();
 
                     String cleanedPriceString = priceString.replace(" ден.", "").replace(".", "").split(",")[0];
@@ -76,10 +76,10 @@ public class HDDScraperService {
                     String formFactor = determineFormFactor(name);
                     String brand = determineBrand(name, knownBrands);
                     int capacity = determineCapacity(name);
-                    String type = "HDD"; // Set the type to HDD
+                    String type = "SSD"; // Set the type to SSD
 
                     if (brand != null && capacity > 0) {
-                        Optional<Storage> partModel = determineAndSavePartModel(name, hddPart, formFactor, brand, capacity, type);
+                        Optional<Storage> partModel = determineAndSavePartModel(name, ssdPart, formFactor, brand, capacity, type);
 
                         if (partModel.isPresent()) {
                             Product product = new Product();
@@ -87,7 +87,7 @@ public class HDDScraperService {
                             product.setImageUrl(imageUrl);
                             product.setProductUrl(productUrl);
                             product.setPrice(price);
-                            product.setPart(hddPart);
+                            product.setPart(ssdPart);
                             product.setPartModel(partModel.get());
 
                             productService.saveProduct(product);
@@ -109,9 +109,6 @@ public class HDDScraperService {
 
     private List<String> scrapeBrands(WebDriver driver) {
         List<String> brands = new ArrayList<>();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".filter-brands .form-check label")));
-
         List<WebElement> brandElements = driver.findElements(By.cssSelector(".filter-brands .form-check label"));
         for (WebElement brandElement : brandElements) {
             brands.add(brandElement.getAttribute("textContent").trim());
@@ -122,11 +119,11 @@ public class HDDScraperService {
     private String determineFormFactor(String productName) {
         if (productName.contains("2.5\"")) {
             return "2.5\"";
-        } else if (productName.contains("3.5\"")) {
-            return "3.5\"";
+        } else if (productName.contains("M.2")) {
+            return "M.2";
         }
         // Add more form factors as necessary
-        return "Unknown";
+        return "M.2"; // TODO: maybe fix later?
     }
 
     private String determineBrand(String productName, List<String> knownBrands) {
@@ -151,7 +148,7 @@ public class HDDScraperService {
         return 0;
     }
 
-    private Optional<Storage> determineAndSavePartModel(String productName, Part hddPart, String formFactor, String brand, int capacity, String type) {
+    private Optional<Storage> determineAndSavePartModel(String productName, Part ssdPart, String formFactor, String brand, int capacity, String type) {
         List<Storage> partModels = storageService.findAll();
 
         for (Storage model : partModels) {
@@ -161,8 +158,7 @@ public class HDDScraperService {
             }
         }
 
-        Storage newStorage = new Storage(brand, hddPart, formFactor, capacity, type);
+        Storage newStorage = new Storage(brand, ssdPart, formFactor, capacity, type);
         return Optional.of(storageService.save(newStorage));
     }
 }
-

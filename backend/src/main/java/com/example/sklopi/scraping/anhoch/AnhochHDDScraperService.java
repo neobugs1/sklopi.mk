@@ -1,11 +1,11 @@
-package com.example.sklopi.scraping;
+package com.example.sklopi.scraping.anhoch;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.Product;
-import com.example.sklopi.model.parts.PcCase;
+import com.example.sklopi.model.parts.Storage;
 import com.example.sklopi.service.PartService;
 import com.example.sklopi.service.ProductService;
-import com.example.sklopi.service.parts.PcCaseService;
+import com.example.sklopi.service.parts.StorageService;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -20,20 +20,22 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
-public class PcCaseScraperService {
+public class AnhochHDDScraperService {
 
     @Autowired
     private PartService partService;
 
     @Autowired
-    private PcCaseService caseService;
+    private StorageService storageService;
 
     @Autowired
     private ProductService productService;
 
-    public void scrapeAndSaveCases() {
+    public void scrapeAndSaveHDDs() {
         System.setProperty("webdriver.chrome.driver", "C:\\ChromeDriver\\chromedriver.exe");
 
         ChromeOptions options = new ChromeOptions();
@@ -42,46 +44,42 @@ public class PcCaseScraperService {
         WebDriver driver = new ChromeDriver(options);
 
         try {
-            driver.get("https://www.anhoch.com/categories/kukjishta/products?brand=&attribute=&fromPrice=1200&toPrice=16970&inStockOnly=1&sort=priceLowToHigh&perPage=100&page=1");
+            driver.get("https://www.anhoch.com/categories/interni-hdd/products?brand=&attribute=&toPrice=274980&inStockOnly=1&sort=latest&perPage=100&page=1");
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product-card")));
 
-            List<WebElement> caseElements = driver.findElements(By.cssSelector(".product-card"));
+            List<WebElement> hddElements = driver.findElements(By.cssSelector(".product-card"));
 
-            if (caseElements.isEmpty()) {
+            if (hddElements.isEmpty()) {
                 System.out.println("No elements found with the selector .product-card");
             } else {
                 List<String> knownBrands = scrapeBrands(driver);
 
-                Part casePart = partService.findByName("Case").orElseGet(() -> {
+                Part hddPart = partService.findByName("Storage").orElseGet(() -> {
                     Part newPart = new Part();
-                    newPart.setName("Case");
+                    newPart.setName("Storage");
                     return partService.savePart(newPart);
                 });
 
-                for (WebElement caseElement : caseElements) {
-                    String name = caseElement.findElement(By.cssSelector(".product-name h6")).getText();
+                for (WebElement hddElement : hddElements) {
+                    String imageUrl = hddElement.findElement(By.cssSelector(".product-image img")).getAttribute("src");
+                    String productUrl = hddElement.findElement(By.cssSelector(".product-card-middle a")).getAttribute("href");
+                    String name = hddElement.findElement(By.cssSelector(".product-name h6")).getText();
 
-                    // Ignore the misplaced case
-                    if (name.contains("White Shark Torpedo GCC-2304") || name.contains("ITX")) {
-                        continue;
-                    }
-
-                    String imageUrl = caseElement.findElement(By.cssSelector(".product-image img")).getAttribute("src");
-                    String productUrl = caseElement.findElement(By.cssSelector(".product-card-middle a")).getAttribute("href");
-
-                    WebElement priceElement = caseElement.findElement(By.cssSelector(".product-card-bottom div"));
+                    WebElement priceElement = hddElement.findElement(By.cssSelector(".product-card-bottom div"));
                     String priceString = priceElement.getText().trim();
 
                     String cleanedPriceString = priceString.replace(" ден.", "").replace(".", "").split(",")[0];
                     int price = Integer.parseInt(cleanedPriceString);
 
-                    String brand = determineBrand(name, knownBrands);
                     String formFactor = determineFormFactor(name);
+                    String brand = determineBrand(name, knownBrands);
+                    int capacity = determineCapacity(name);
+                    String type = "HDD"; // Set the type to HDD
 
-                    if (brand != null && formFactor != null) {
-                        Optional<PcCase> partModel = determineAndSavePartModel(name, casePart, brand, formFactor);
+                    if (brand != null && capacity > 0) {
+                        Optional<Storage> partModel = determineAndSavePartModel(name, hddPart, formFactor, brand, capacity, type);
 
                         if (partModel.isPresent()) {
                             Product product = new Product();
@@ -89,7 +87,7 @@ public class PcCaseScraperService {
                             product.setImageUrl(imageUrl);
                             product.setProductUrl(productUrl);
                             product.setPrice(price);
-                            product.setPart(casePart);
+                            product.setPart(hddPart);
                             product.setPartModel(partModel.get());
 
                             productService.saveProduct(product);
@@ -111,11 +109,24 @@ public class PcCaseScraperService {
 
     private List<String> scrapeBrands(WebDriver driver) {
         List<String> brands = new ArrayList<>();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".filter-brands .form-check label")));
+
         List<WebElement> brandElements = driver.findElements(By.cssSelector(".filter-brands .form-check label"));
         for (WebElement brandElement : brandElements) {
             brands.add(brandElement.getAttribute("textContent").trim());
         }
         return brands;
+    }
+
+    private String determineFormFactor(String productName) {
+        if (productName.contains("2.5\"")) {
+            return "2.5\"";
+        } else if (productName.contains("3.5\"")) {
+            return "3.5\"";
+        }
+        // Add more form factors as necessary
+        return "Unknown";
     }
 
     private String determineBrand(String productName, List<String> knownBrands) {
@@ -127,21 +138,31 @@ public class PcCaseScraperService {
         return null;
     }
 
-    private String determineFormFactor(String productName) {
-        if (productName.contains("Micro")) {
-            return "mATX";
-        } else if (productName.contains("E-ATX")) {
-            return "E-ATX";
-        } else {
-            return "ATX";
+    private int determineCapacity(String productName) {
+        Pattern pattern = Pattern.compile("(\\d+)(GB|TB)");
+        Matcher matcher = pattern.matcher(productName);
+        if (matcher.find()) {
+            int size = Integer.parseInt(matcher.group(1));
+            if (matcher.group(2).equals("TB")) {
+                size *= 1024; // Convert TB to GB
+            }
+            return size;
         }
+        return 0;
     }
 
-    private Optional<PcCase> determineAndSavePartModel(String productName, Part casePart, String brand, String formFactor) {
-        return caseService.findByBrandAndFormFactor(brand, formFactor)
-                .or(() -> {
-                    PcCase newCase = new PcCase(casePart, brand, formFactor);
-                    return Optional.of(caseService.save(newCase));
-                });
+    private Optional<Storage> determineAndSavePartModel(String productName, Part hddPart, String formFactor, String brand, int capacity, String type) {
+        List<Storage> partModels = storageService.findAll();
+
+        for (Storage model : partModels) {
+            if (model.getFormFactor().equals(formFactor) && model.getName().equals(brand) &&
+                    model.getCapacity() == capacity && model.getType().equals(type)) {
+                return Optional.of(model);
+            }
+        }
+
+        Storage newStorage = new Storage(brand, hddPart, formFactor, capacity, type);
+        return Optional.of(storageService.save(newStorage));
     }
 }
+

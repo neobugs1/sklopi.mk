@@ -1,12 +1,11 @@
-package com.example.sklopi.scraping;
+package com.example.sklopi.scraping.anhoch;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.Product;
-import com.example.sklopi.model.parts.CPU;
+import com.example.sklopi.model.parts.GPU;
 import com.example.sklopi.service.PartService;
 import com.example.sklopi.service.ProductService;
-import com.example.sklopi.service.parts.CPUService;
-import com.example.sklopi.repository.PriceHistoryRepository;
+import com.example.sklopi.service.parts.GPUService;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -23,21 +22,19 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CPUScraperService {
+public class AnhochGPUScraperService {
 
     @Autowired
     private PartService partService;
 
     @Autowired
-    private CPUService cpuService;
+    private GPUService gpuService;
 
     @Autowired
     private ProductService productService;
 
-    @Autowired
-    private PriceHistoryRepository priceHistoryRepository;
 
-    public void scrapeAndSaveCPUs() {
+    public void scrapeAndSaveGPUs() {
         System.setProperty("webdriver.chrome.driver", "C:\\ChromeDriver\\chromedriver.exe");
 
         ChromeOptions options = new ChromeOptions();
@@ -46,44 +43,44 @@ public class CPUScraperService {
         WebDriver driver = new ChromeDriver(options);
 
         try {
-            driver.get("https://www.anhoch.com/categories/procesori/products?brand=&attribute=&toPrice=274980&inStockOnly=1&sort=latest&perPage=100&page=1"); // Replace with the actual URL
+            driver.get("https://www.anhoch.com/categories/grafichki-karti/products?brand=&attribute=&toPrice=274980&inStockOnly=1&sort=priceHighToLow&perPage=100&page=1");
 
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product-card"))); // Update the selector as needed
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product-card")));
 
-            List<WebElement> cpuElements = driver.findElements(By.cssSelector(".product-card")); // Update the selector as needed
+            List<WebElement> gpuElements = driver.findElements(By.cssSelector(".product-card"));
 
-            if (cpuElements.isEmpty()) {
+            if (gpuElements.isEmpty()) {
                 System.out.println("No elements found with the selector .product-card");
             } else {
-                Part cpuPart = partService.findByName("CPU").orElseGet(() -> {
+                Part gpuPart = partService.findByName("GPU").orElseGet(() -> {
                     Part newPart = new Part();
-                    newPart.setName("CPU");
+                    newPart.setName("GPU");
                     return partService.savePart(newPart);
                 });
 
-                for (WebElement cpuElement : cpuElements) {
-                    String imageUrl = cpuElement.findElement(By.cssSelector(".product-image img")).getAttribute("src");
-                    String productUrl = cpuElement.findElement(By.cssSelector(".product-card-middle a")).getAttribute("href");
-                    String name = cpuElement.findElement(By.cssSelector(".product-name h6")).getText();
+                for (WebElement gpuElement : gpuElements) {
+                    String imageUrl = gpuElement.findElement(By.cssSelector(".product-image img")).getAttribute("src");
+                    String productUrl = gpuElement.findElement(By.cssSelector(".product-card-middle a")).getAttribute("href");
+                    String name = gpuElement.findElement(By.cssSelector(".product-name h6")).getText();
 
-                    WebElement priceElement = cpuElement.findElement(By.cssSelector(".product-card-bottom div")); // Update the selector as needed
+                    WebElement priceElement = gpuElement.findElement(By.cssSelector(".product-card-bottom div"));
                     String priceString = priceElement.getText().trim();
 
                     String cleanedPriceString = priceString.replace(" ден.", "").replace(".", "").split(",")[0];
                     int price = Integer.parseInt(cleanedPriceString);
 
-                    Optional<CPU> partModelOptional = determinePartModel(name, cpuPart);
+                    Optional<GPU> partModelOptional = determinePartModel(name, gpuPart);
 
                     if (partModelOptional.isPresent()) {
-                        CPU partModel = partModelOptional.get();
+                        GPU partModel = partModelOptional.get();
 
                         Product product = new Product();
                         product.setName(name);
                         product.setImageUrl(imageUrl);
                         product.setProductUrl(productUrl);
                         product.setPrice(price);
-                        product.setPart(cpuPart);
+                        product.setPart(gpuPart);
                         product.setPartModel(partModel);
 
                         productService.saveProduct(product);
@@ -100,13 +97,13 @@ public class CPUScraperService {
         }
     }
 
-    private Optional<CPU> determinePartModel(String productName, Part cpuPart) {
-        List<CPU> partModels = cpuService.findAll();
+    private Optional<GPU> determinePartModel(String productName, Part gpuPart) {
+        List<GPU> partModels = gpuService.findAll();
 
-        // Sort part models by length in descending order
-        partModels.sort(Comparator.comparingInt((CPU model) -> model.getName().length()).reversed());
+        // sort, opagjacki redosled bidejki ima slicni iminja, najprvin treba podolgite da gi pomineme
+        partModels.sort(Comparator.comparingInt((GPU model) -> model.getName().length()).reversed());
 
-        for (CPU model : partModels) {
+        for (GPU model : partModels) {
             if (productName.contains(model.getName())) {
                 return Optional.of(model);
             }

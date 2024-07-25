@@ -1,11 +1,11 @@
-package com.example.sklopi.scraping;
+package com.example.sklopi.scraping.anhoch;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.Product;
-import com.example.sklopi.model.parts.CPUCooler;
+import com.example.sklopi.model.parts.PSU;
 import com.example.sklopi.service.PartService;
 import com.example.sklopi.service.ProductService;
-import com.example.sklopi.service.parts.CPUCoolerService;
+import com.example.sklopi.service.parts.PSUService;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -20,20 +20,22 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
-public class LiquidCoolerScraperService {
+public class AnhochPSUScraperService {
 
     @Autowired
     private PartService partService;
 
     @Autowired
-    private CPUCoolerService cpuCoolerService;
+    private PSUService psuService;
 
     @Autowired
     private ProductService productService;
 
-    public void scrapeAndSaveLiquidCoolers() {
+    public void scrapeAndSavePSUs() {
         System.setProperty("webdriver.chrome.driver", "C:\\ChromeDriver\\chromedriver.exe");
 
         ChromeOptions options = new ChromeOptions();
@@ -42,39 +44,41 @@ public class LiquidCoolerScraperService {
         WebDriver driver = new ChromeDriver(options);
 
         try {
-            driver.get("https://www.anhoch.com/categories/vodeno-ladenje/products?brand=&attribute=&fromPrice=1500&toPrice=274980&inStockOnly=1&sort=latest&perPage=100&page=1");
+            driver.get("https://www.anhoch.com/categories/napojuvanja/products?brand=&attribute=&fromPrice=1500&toPrice=274980&inStockOnly=1&sort=latest&perPage=100&page=1");
 
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product-card")));
 
-            List<WebElement> coolerElements = driver.findElements(By.cssSelector(".product-card"));
+            List<WebElement> psuElements = driver.findElements(By.cssSelector(".product-card"));
 
-            if (coolerElements.isEmpty()) {
+            if (psuElements.isEmpty()) {
                 System.out.println("No elements found with the selector .product-card");
             } else {
                 List<String> knownBrands = scrapeBrands(driver);
 
-                Part coolerPart = partService.findByName("Liquid Cooler").orElseGet(() -> {
+                Part psuPart = partService.findByName("PSU").orElseGet(() -> {
                     Part newPart = new Part();
-                    newPart.setName("Liquid Cooler");
+                    newPart.setName("PSU");
                     return partService.savePart(newPart);
                 });
 
-                for (WebElement coolerElement : coolerElements) {
-                    String imageUrl = coolerElement.findElement(By.cssSelector(".product-image img")).getAttribute("src");
-                    String productUrl = coolerElement.findElement(By.cssSelector(".product-card-middle a")).getAttribute("href");
-                    String name = coolerElement.findElement(By.cssSelector(".product-name h6")).getText();
+                for (WebElement psuElement : psuElements) {
+                    String imageUrl = psuElement.findElement(By.cssSelector(".product-image img")).getAttribute("src");
+                    String productUrl = psuElement.findElement(By.cssSelector(".product-card-middle a")).getAttribute("href");
+                    String name = psuElement.findElement(By.cssSelector(".product-name h6")).getText();
 
-                    WebElement priceElement = coolerElement.findElement(By.cssSelector(".product-card-bottom div"));
+                    WebElement priceElement = psuElement.findElement(By.cssSelector(".product-card-bottom div"));
                     String priceString = priceElement.getText().trim();
 
                     String cleanedPriceString = priceString.replace(" ден.", "").replace(".", "").split(",")[0];
                     int price = Integer.parseInt(cleanedPriceString);
 
                     String brand = determineBrand(name, knownBrands);
+                    String efficiencyRating = determineEfficiencyRating(name);
+                    int wattage = determineWattage(name);
 
-                    if (brand != null) {
-                        Optional<CPUCooler> partModel = determineAndSavePartModel(name, coolerPart, brand);
+                    if (brand != null && efficiencyRating != null && wattage > 0) {
+                        Optional<PSU> partModel = determineAndSavePartModel(name, psuPart, brand, efficiencyRating, wattage);
 
                         if (partModel.isPresent()) {
                             Product product = new Product();
@@ -82,7 +86,7 @@ public class LiquidCoolerScraperService {
                             product.setImageUrl(imageUrl);
                             product.setProductUrl(productUrl);
                             product.setPrice(price);
-                            product.setPart(coolerPart);
+                            product.setPart(psuPart);
                             product.setPartModel(partModel.get());
 
                             productService.saveProduct(product);
@@ -106,25 +110,55 @@ public class LiquidCoolerScraperService {
         List<String> brands = new ArrayList<>();
         List<WebElement> brandElements = driver.findElements(By.cssSelector(".filter-brands .form-check label"));
         for (WebElement brandElement : brandElements) {
-            brands.add(brandElement.getAttribute("textContent").trim());
+            String brand = brandElement.getAttribute("textContent").trim();
+            if (brand.equalsIgnoreCase("SBOX")) { // Anhoch gi kategorizira "White Shark" kako SBOX
+                brand = "White Shark";
+            }
+            brands.add(brand);
         }
         return brands;
     }
 
     private String determineBrand(String productName, List<String> knownBrands) {
         for (String brand : knownBrands) {
-            if (productName.contains(brand)) {
+            if (productName.toLowerCase().contains(brand.toLowerCase())) {
                 return brand;
             }
         }
         return null;
     }
 
-    private Optional<CPUCooler> determineAndSavePartModel(String productName, Part coolerPart, String brand) {
-        return cpuCoolerService.findByNameAndCoolerType(brand, "Liquid")
+    private String determineEfficiencyRating(String productName) {
+        if (productName.toLowerCase().contains("titanium")) {
+            return "80+ Titanium";
+        } else if (productName.toLowerCase().contains("platinum")) {
+            return "80+ Platinum";
+        } else if (productName.toLowerCase().contains("gold")) {
+            return "80+ Gold";
+        } else if (productName.toLowerCase().contains("silver")) {
+            return "80+ Silver";
+        } else if (productName.toLowerCase().contains("bronze")) {
+            return "80+ Bronze";
+        } else if (productName.toLowerCase().contains("black") || productName.toLowerCase().contains("white")) {
+            return "80+";
+        }
+        return null;
+    }
+
+    private int determineWattage(String productName) {
+        Pattern pattern = Pattern.compile("(\\d+)W", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(productName);
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group(1));
+        }
+        return 0;
+    }
+
+    private Optional<PSU> determineAndSavePartModel(String productName, Part psuPart, String brand, String efficiencyRating, int wattage) {
+        return psuService.findByBrandAndEfficiencyRatingAndWattage(brand, efficiencyRating, wattage)
                 .or(() -> {
-                    CPUCooler newCooler = new CPUCooler(brand, coolerPart, "Liquid");
-                    return Optional.of(cpuCoolerService.save(newCooler));
+                    PSU newPSU = new PSU(psuPart, brand, efficiencyRating, wattage);
+                    return Optional.of(psuService.save(newPSU));
                 });
     }
 }
