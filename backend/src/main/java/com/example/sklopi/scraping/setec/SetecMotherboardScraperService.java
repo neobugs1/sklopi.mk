@@ -2,10 +2,10 @@ package com.example.sklopi.scraping.setec;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.Product;
-import com.example.sklopi.model.parts.CPU;
+import com.example.sklopi.model.parts.Motherboard;
 import com.example.sklopi.service.PartService;
 import com.example.sklopi.service.ProductService;
-import com.example.sklopi.service.parts.CPUService;
+import com.example.sklopi.service.parts.MotherboardService;
 import com.example.sklopi.repository.PriceHistoryRepository;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -24,13 +24,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class SetecCPUScraperService {
+public class SetecMotherboardScraperService {
 
     @Autowired
     private PartService partService;
 
     @Autowired
-    private CPUService cpuService;
+    private MotherboardService motherboardService;
 
     @Autowired
     private ProductService productService;
@@ -38,7 +38,7 @@ public class SetecCPUScraperService {
     @Autowired
     private PriceHistoryRepository priceHistoryRepository;
 
-    public void scrapeAndSaveCPUs() {
+    public void scrapeAndSaveMotherboards() {
         System.setProperty("webdriver.chrome.driver", "C:\\ChromeDriver\\chromedriver.exe");
 
         ChromeOptions options = new ChromeOptions();
@@ -47,51 +47,50 @@ public class SetecCPUScraperService {
         WebDriver driver = new ChromeDriver(options);
 
         try {
-            driver.get("https://setec.mk/компјутери-и-it-опрема/компјутери-и-компјутерски-делови/процесори?limit=100&mfp=price[3000,80000]");
+            driver.get("https://setec.mk/компјутери-и-it-опрема/компјутери-и-компјутерски-делови/матични-плочи?limit=100&mfp=price[3000,80000]");
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product")));
 
-            List<WebElement> cpuElements = driver.findElements(By.cssSelector(".product"));
+            List<WebElement> motherboardElements = driver.findElements(By.cssSelector(".product"));
 
-            if (cpuElements.isEmpty()) {
+            if (motherboardElements.isEmpty()) {
                 System.out.println("No elements found with the selector .product");
             } else {
-                Part cpuPart = partService.findByName("CPU").orElseGet(() -> {
+                Part motherboardPart = partService.findByName("Motherboard").orElseGet(() -> {
                     Part newPart = new Part();
-                    newPart.setName("CPU");
+                    newPart.setName("Motherboard");
                     return partService.savePart(newPart);
                 });
 
                 JavascriptExecutor js = (JavascriptExecutor) driver;
 
-                for (WebElement cpuElement : cpuElements) {
+                for (WebElement motherboardElement : motherboardElements) {
                     // Scroll za da se loadnat site sliki na setec
-                    js.executeScript("arguments[0].scrollIntoView(true);", cpuElement);
+                    js.executeScript("arguments[0].scrollIntoView(true);", motherboardElement);
                     Thread.sleep(200);
 
-                    String imageUrl = cpuElement.findElement(By.cssSelector(".image .zoom-image-effect")).getAttribute("src");
-                    String productUrl = cpuElement.findElement(By.cssSelector(".name a")).getAttribute("href");
-                    String name = cpuElement.findElement(By.cssSelector(".name a")).getText();
-                    name = name.replace("-", " ");
+                    String imageUrl = motherboardElement.findElement(By.cssSelector(".image .zoom-image-effect")).getAttribute("src");
+                    String productUrl = motherboardElement.findElement(By.cssSelector(".name a")).getAttribute("href");
+                    String name = motherboardElement.findElement(By.cssSelector(".name a")).getText();
 
-                    WebElement priceElement = cpuElement.findElement(By.cssSelector(".category-price-akciska .price-new-new, .category-price-redovna .cena_za_kesh"));
+                    WebElement priceElement = motherboardElement.findElement(By.cssSelector(".category-price-akciska .price-new-new, .category-price-redovna .cena_za_kesh"));
                     String priceString = priceElement.getText().trim();
 
                     String cleanedPriceString = priceString.replace(" Ден.", "").replace(",", "");
                     int price = Integer.parseInt(cleanedPriceString);
 
-                    Optional<CPU> partModelOptional = determinePartModel(name, cpuPart);
+                    Optional<Motherboard> partModelOptional = determinePartModel(name, motherboardPart);
 
                     if (partModelOptional.isPresent()) {
-                        CPU partModel = partModelOptional.get();
+                        Motherboard partModel = partModelOptional.get();
 
                         Product product = new Product();
                         product.setName(name);
                         product.setImageUrl(imageUrl);
                         product.setProductUrl(productUrl);
                         product.setPrice(price);
-                        product.setPart(cpuPart);
+                        product.setPart(motherboardPart);
                         product.setPartModel(partModel);
 
                         productService.saveProduct(product);
@@ -108,12 +107,12 @@ public class SetecCPUScraperService {
         }
     }
 
-    private Optional<CPU> determinePartModel(String productName, Part cpuPart) {
-        List<CPU> partModels = cpuService.findAll();
+    private Optional<Motherboard> determinePartModel(String productName, Part motherboardPart) {
+        List<Motherboard> partModels = motherboardService.findAll();
 
-        partModels.sort(Comparator.comparingInt((CPU model) -> model.getName().length()).reversed());
+        partModels.sort(Comparator.comparingInt((Motherboard model) -> model.getName().length()).reversed());
 
-        for (CPU model : partModels) {
+        for (Motherboard model : partModels) {
             if (productName.contains(model.getName())) {
                 return Optional.of(model);
             }

@@ -68,11 +68,9 @@ public class SetecGPUScraperService {
                 for (int i = 0; i < gpuElements.size(); i++) {
                     WebElement gpuElement = gpuElements.get(i);
 
-                    // Scroll to the element
                     js.executeScript("arguments[0].scrollIntoView(true);", gpuElement);
                     Thread.sleep(200);
 
-                    // Wait for the image to load
                     wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".image .zoom-image-effect")));
 
                     WebElement stockElement;
@@ -88,13 +86,10 @@ public class SetecGPUScraperService {
                         continue;
                     }
 
-                    // Get the image URL
                     WebElement imageElement = gpuElement.findElement(By.cssSelector(".image .zoom-image-effect"));
                     String imageUrl = imageElement.getAttribute("src");
 
-                    // Get the product URL
                     String productUrl = gpuElement.findElement(By.cssSelector(".name a")).getAttribute("href");
-                    // Get the product name
                     String name = gpuElement.findElement(By.cssSelector(".name a")).getText();
 
                     String priceString = null;
@@ -115,7 +110,6 @@ public class SetecGPUScraperService {
                         }
                     }
 
-                    // Remove currency and format the price
                     if (priceString != null) {
                         String cleanedPriceString = priceString.replace(" Ден.", "").replace(",", "");
                         int price = Integer.parseInt(cleanedPriceString);
@@ -145,7 +139,6 @@ public class SetecGPUScraperService {
                         }
                     }
 
-                    // Re-fetch the list of elements after scrolling
                     gpuElements = driver.findElements(By.cssSelector(".product"));
                 }
             }
@@ -159,14 +152,13 @@ public class SetecGPUScraperService {
     public static String extractGpuModel(String name) {
         String cleanName = name.toUpperCase().replaceAll("[^A-Z0-9]", " ");
 
-        // Regular expression to extract GPU model
+        // REGEX za graficki
         Pattern pattern = Pattern.compile("(RTX|GTX|RX)\\s*(\\d{3,4})(TI)?(S)?(XT|XTX|GRE)?");
         Matcher matcher = pattern.matcher(cleanName);
 
         if (matcher.find()) {
             StringBuilder gpuModel = new StringBuilder();
 
-            // Extract and format the GPU model
             if (matcher.group(1) != null) {
                 gpuModel.append(matcher.group(1)).append(" ");
             }
@@ -183,19 +175,17 @@ public class SetecGPUScraperService {
                 gpuModel.append(matcher.group(5));
             }
 
-            // Trim extra spaces
             String result = gpuModel.toString().trim();
 
             return result;
         }
 
-        return null; // Return null if no GPU model is found
+        return null;
     }
 
     private Optional<GPU> determinePartModel(String extractedModel, Part gpuPart) {
         List<GPU> partModels = gpuService.findAll();
 
-        // Sort, descending order since there are similar names, longer ones should be checked first
         partModels.sort(Comparator.comparingInt((GPU model) -> model.getName().length()).reversed());
 
         for (GPU model : partModels) {
