@@ -3,6 +3,7 @@ package com.example.sklopi.config;
 import com.example.sklopi.scraping.anhoch.*;
 import com.example.sklopi.scraping.setec.SetecCPUScraperService;
 import com.example.sklopi.scraping.setec.SetecGPUScraperService;
+import com.example.sklopi.scraping.setec.SetecHDDScraperService;
 import com.example.sklopi.scraping.setec.SetecMotherboardScraperService;
 import com.example.sklopi.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,8 @@ public class ScrapingRunner implements CommandLineRunner {
     private SetecMotherboardScraperService setecMotherboardScraperService;
     @Autowired
     private com.example.sklopi.scraping.newwebsite.SetecRAMScraperService setecRAMScraperService;
+    @Autowired
+    private SetecHDDScraperService setecHDDScraperService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -54,6 +57,7 @@ public class ScrapingRunner implements CommandLineRunner {
 //        anhochCpuScraperService.scrapeAndSaveCPUs();
 //        setecCPUScraperService.scrapeAndSaveCPUs();
 //        setecMotherboardScraperService.scrapeAndSaveMotherboards();
-        setecRAMScraperService.scrapeAndSaveRAMs();
+//        setecRAMScraperService.scrapeAndSaveRAMs();
+        setecHDDScraperService.scrapeAndSaveHDDs();
     }
 }
