@@ -66,37 +66,67 @@ public class SetecMotherboardScraperService {
                 JavascriptExecutor js = (JavascriptExecutor) driver;
 
                 for (WebElement motherboardElement : motherboardElements) {
-                    // Scroll za da se loadnat site sliki na setec
+                    // Scroll to load all images on the Setec website
                     js.executeScript("arguments[0].scrollIntoView(true);", motherboardElement);
                     Thread.sleep(200);
+
+                    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".image .zoom-image-effect")));
+
+                    WebElement stockElement;
+                    try {
+                        stockElement = motherboardElement.findElement(By.cssSelector(".lager div"));
+                    } catch (org.openqa.selenium.NoSuchElementException e) {
+                        // No stock information available, skip this product
+                        continue;
+                    }
+
+                    if (!stockElement.getAttribute("class").contains("ima_zaliha")) {
+                        // Product is out of stock, skip it
+                        continue;
+                    }
 
                     String imageUrl = motherboardElement.findElement(By.cssSelector(".image .zoom-image-effect")).getAttribute("src");
                     String productUrl = motherboardElement.findElement(By.cssSelector(".name a")).getAttribute("href");
                     String name = motherboardElement.findElement(By.cssSelector(".name a")).getText();
 
-                    WebElement priceElement = motherboardElement.findElement(By.cssSelector(".category-price-akciska .price-new-new, .category-price-redovna .cena_za_kesh"));
-                    String priceString = priceElement.getText().trim();
+                    WebElement priceElement = null;
+                    try {
+                        // Try to find the discounted price
+                        priceElement = motherboardElement.findElement(By.cssSelector(".category-price-akciska .price-new-new"));
+                    } catch (org.openqa.selenium.NoSuchElementException e) {
+                        // If the discounted price is not found, try to find the regular price in the new structure
+                        try {
+                            priceElement = motherboardElement.findElement(By.cssSelector(".category-price-redovna .cena_za_kesh"));
+                        } catch (org.openqa.selenium.NoSuchElementException e1) {
+                            // If neither price is found, handle this case (e.g., set a default value or log a message)
+                            System.out.println("Price not found for product: " + name);
+                            continue;
+                        }
+                    }
 
-                    String cleanedPriceString = priceString.replace(" Ден.", "").replace(",", "");
-                    int price = Integer.parseInt(cleanedPriceString);
+                    if (priceElement != null) {
+                        String priceString = priceElement.getText().trim();
+                        String cleanedPriceString = priceString.replace(" Ден.", "").replace(",", "");
+                        int price = Integer.parseInt(cleanedPriceString);
 
-                    Optional<Motherboard> partModelOptional = determinePartModel(name, motherboardPart);
+                        Optional<Motherboard> partModelOptional = determinePartModel(name, motherboardPart);
 
-                    if (partModelOptional.isPresent()) {
-                        Motherboard partModel = partModelOptional.get();
+                        if (partModelOptional.isPresent()) {
+                            Motherboard partModel = partModelOptional.get();
 
-                        Product product = new Product();
-                        product.setName(name);
-                        product.setImageUrl(imageUrl);
-                        product.setProductUrl(productUrl);
-                        product.setPrice(price);
-                        product.setPart(motherboardPart);
-                        product.setPartModel(partModel);
+                            Product product = new Product();
+                            product.setName(name);
+                            product.setImageUrl(imageUrl);
+                            product.setProductUrl(productUrl);
+                            product.setPrice(price);
+                            product.setPart(motherboardPart);
+                            product.setPartModel(partModel);
 
-                        productService.saveProduct(product);
-                        System.out.println("Processed product: " + name + " with price: " + price);
-                    } else {
-                        System.out.println("Skipped product (unknown model): " + name);
+                            productService.saveProduct(product);
+                            System.out.println("Processed product: " + name + " with price: " + price);
+                        } else {
+                            System.out.println("Skipped product (unknown model): " + name);
+                        }
                     }
                 }
             }

@@ -50,7 +50,7 @@ public class ScrapingRunner implements CommandLineRunner {
 
 //        setecGPUScraperService.scrapeAndSaveGPUs();
 //        anhochCpuScraperService.scrapeAndSaveCPUs();
-//        setecCPUScraperService.scrapeAndSaveCPUs();
-        setecMotherboardScraperService.scrapeAndSaveMotherboards();
+        setecCPUScraperService.scrapeAndSaveCPUs();
+//        setecMotherboardScraperService.scrapeAndSaveMotherboards();
     }
 }

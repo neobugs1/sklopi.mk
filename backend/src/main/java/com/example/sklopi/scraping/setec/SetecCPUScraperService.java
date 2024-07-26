@@ -65,40 +65,75 @@ public class SetecCPUScraperService {
 
                 JavascriptExecutor js = (JavascriptExecutor) driver;
 
-                for (WebElement cpuElement : cpuElements) {
-                    // Scroll za da se loadnat site sliki na setec
+                for (int i = 0; i < cpuElements.size(); i++) {
+                    WebElement cpuElement = cpuElements.get(i);
+
                     js.executeScript("arguments[0].scrollIntoView(true);", cpuElement);
                     Thread.sleep(200);
+
+                    wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".image .zoom-image-effect")));
+
+                    WebElement stockElement;
+                    try {
+                        stockElement = cpuElement.findElement(By.cssSelector(".lager div"));
+                    } catch (org.openqa.selenium.NoSuchElementException e) {
+                        // No stock information available, skip this product
+                        continue;
+                    }
+
+                    if (!stockElement.getAttribute("class").contains("ima_zaliha")) {
+                        // Product is out of stock, skip it
+                        continue;
+                    }
 
                     String imageUrl = cpuElement.findElement(By.cssSelector(".image .zoom-image-effect")).getAttribute("src");
                     String productUrl = cpuElement.findElement(By.cssSelector(".name a")).getAttribute("href");
                     String name = cpuElement.findElement(By.cssSelector(".name a")).getText();
                     name = name.replace("-", " ");
 
-                    WebElement priceElement = cpuElement.findElement(By.cssSelector(".category-price-akciska .price-new-new, .category-price-redovna .cena_za_kesh"));
-                    String priceString = priceElement.getText().trim();
+                    WebElement priceElement = null;
 
-                    String cleanedPriceString = priceString.replace(" Ден.", "").replace(",", "");
-                    int price = Integer.parseInt(cleanedPriceString);
-
-                    Optional<CPU> partModelOptional = determinePartModel(name, cpuPart);
-
-                    if (partModelOptional.isPresent()) {
-                        CPU partModel = partModelOptional.get();
-
-                        Product product = new Product();
-                        product.setName(name);
-                        product.setImageUrl(imageUrl);
-                        product.setProductUrl(productUrl);
-                        product.setPrice(price);
-                        product.setPart(cpuPart);
-                        product.setPartModel(partModel);
-
-                        productService.saveProduct(product);
-                        System.out.println("Processed product: " + name + " with price: " + price);
-                    } else {
-                        System.out.println("Skipped product (unknown model): " + name);
+                    try {
+                        // Try to find the discounted price
+                        priceElement = cpuElement.findElement(By.cssSelector(".category-price-akciska .price-new-new"));
+                    } catch (org.openqa.selenium.NoSuchElementException e) {
+                        // If the discounted price is not found, try to find the regular price in the new structure
+                        try {
+                            priceElement = cpuElement.findElement(By.cssSelector(".category-price-redovna .cena_za_kesh"));
+                        } catch (org.openqa.selenium.NoSuchElementException e1) {
+                            // If neither price is found, handle this case (e.g., set a default value or log a message)
+                            System.out.println("Price not found for product: " + name);
+                            continue;
+                        }
                     }
+
+                    if (priceElement != null) {
+                        String priceString = priceElement.getText().trim();
+                        String cleanedPriceString = priceString.replace(" Ден.", "").replace(",", "");
+                        int price = Integer.parseInt(cleanedPriceString);
+
+                        Optional<CPU> partModelOptional = determinePartModel(name, cpuPart);
+
+                        if (partModelOptional.isPresent()) {
+                            CPU partModel = partModelOptional.get();
+
+                            Product product = new Product();
+                            product.setName(name);
+                            product.setImageUrl(imageUrl);
+                            product.setProductUrl(productUrl);
+                            product.setPrice(price);
+                            product.setPart(cpuPart);
+                            product.setPartModel(partModel);
+
+                            productService.saveProduct(product);
+                            System.out.println("Processed product: " + name + " with price: " + price);
+                        } else {
+                            System.out.println("Skipped product (unknown model): " + name);
+                        }
+                    }
+
+                    // Re-fetch the elements to avoid stale element exceptions
+                    cpuElements = driver.findElements(By.cssSelector(".product"));
                 }
             }
         } catch (Exception e) {
