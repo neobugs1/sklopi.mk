@@ -1,6 +1,7 @@
 package com.example.sklopi.config;
 
 import com.example.sklopi.scraping.anhoch.*;
+import com.example.sklopi.scraping.setec.SetecCPUScraperService;
 import com.example.sklopi.scraping.setec.SetecGPUScraperService;
 import com.example.sklopi.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +38,15 @@ public class ScrapingRunner implements CommandLineRunner {
     private ProductService productService;
     @Autowired
     private SetecGPUScraperService setecGPUScraperService;
+    @Autowired
+    private SetecCPUScraperService setecCPUScraperService;
 
     @Override
     public void run(String... args) throws Exception {
         productService.setAllProductsOutOfStock();
 
-        setecGPUScraperService.scrapeAndSaveGPUs();
+//        setecGPUScraperService.scrapeAndSaveGPUs();
+        anhochCpuScraperService.scrapeAndSaveCPUs();
+        setecCPUScraperService.scrapeAndSaveCPUs();
     }
 }

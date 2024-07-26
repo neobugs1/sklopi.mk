@@ -1,4 +1,4 @@
-package com.example.sklopi.scraping.anhoch;
+package com.example.sklopi.scraping.setec;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.Product;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AnhochCPUScraperService {
+public class SetecCPUScraperService {
 
     @Autowired
     private PartService partService;
@@ -46,15 +46,15 @@ public class AnhochCPUScraperService {
         WebDriver driver = new ChromeDriver(options);
 
         try {
-            driver.get("https://www.anhoch.com/categories/procesori/products?brand=&attribute=&toPrice=274980&inStockOnly=1&sort=latest&perPage=100&page=1"); // Replace with the actual URL
+            driver.get("https://setec.mk/компјутери-и-it-опрема/компјутери-и-компјутерски-делови/процесори?limit=100&mfp=price[3000,80000]");
 
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product-card"))); // Update the selector as needed
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product")));
 
-            List<WebElement> cpuElements = driver.findElements(By.cssSelector(".product-card")); // Update the selector as needed
+            List<WebElement> cpuElements = driver.findElements(By.cssSelector(".product"));
 
             if (cpuElements.isEmpty()) {
-                System.out.println("No elements found with the selector .product-card");
+                System.out.println("No elements found with the selector .product");
             } else {
                 Part cpuPart = partService.findByName("CPU").orElseGet(() -> {
                     Part newPart = new Part();
@@ -63,15 +63,15 @@ public class AnhochCPUScraperService {
                 });
 
                 for (WebElement cpuElement : cpuElements) {
-                    String imageUrl = cpuElement.findElement(By.cssSelector(".product-image img")).getAttribute("src");
-                    String productUrl = cpuElement.findElement(By.cssSelector(".product-card-middle a")).getAttribute("href");
-                    String name = cpuElement.findElement(By.cssSelector(".product-name h6")).getText();
-                    name = name.replace("-", " ");
+                    String imageUrl = cpuElement.findElement(By.cssSelector(".image .zoom-image-effect")).getAttribute("src");
+                    String productUrl = cpuElement.findElement(By.cssSelector(".name a")).getAttribute("href");
+                    String name = cpuElement.findElement(By.cssSelector(".name a")).getText();
+                    name = name.replace("-", " "); // Replace dashes with spaces
 
-                    WebElement priceElement = cpuElement.findElement(By.cssSelector(".product-card-bottom div")); // Update the selector as needed
+                    WebElement priceElement = cpuElement.findElement(By.cssSelector(".category-price-akciska .price-new-new, .category-price-redovna .cena_za_kesh"));
                     String priceString = priceElement.getText().trim();
 
-                    String cleanedPriceString = priceString.replace(" ден.", "").replace(".", "").split(",")[0];
+                    String cleanedPriceString = priceString.replace(" Ден.", "").replace(",", "");
                     int price = Integer.parseInt(cleanedPriceString);
 
                     Optional<CPU> partModelOptional = determinePartModel(name, cpuPart);

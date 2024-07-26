@@ -76,18 +76,18 @@ public class SeedCPUs {
 
 
                     // Intel CPUs
-                    new CPU("Core i9-14900KS", cpu, "Intel", "LGA1700", 6000, 6500, false, false),
-                    new CPU("Core i9-14900K", cpu, "Intel", "LGA1700", 5300, 5800, false, false),
-                    new CPU("Core i7-14700K", cpu, "Intel", "LGA1700", 5300, 5700, false, false),
-                    new CPU("Core i5-14600K", cpu, "Intel", "LGA1700", 4600, 5000, false, false),
-                    new CPU("Core i5-14500", cpu, "Intel", "LGA1700", 4600, 4900, false, false),
-                    new CPU("Core i5-14400", cpu, "Intel", "LGA1700", 4400, 4800, false, false),
+                    new CPU("i9 14900KS", cpu, "Intel", "LGA1700", 6000, 6500, false, false),
+                    new CPU("i9 14900K", cpu, "Intel", "LGA1700", 5300, 5800, false, false),
+                    new CPU("i7 14700K", cpu, "Intel", "LGA1700", 5300, 5700, false, false),
+                    new CPU("i5 14600K", cpu, "Intel", "LGA1700", 4600, 5000, false, false),
+                    new CPU("i5 14500", cpu, "Intel", "LGA1700", 4600, 4900, false, false),
+                    new CPU("i5 14400", cpu, "Intel", "LGA1700", 4400, 4800, false, false),
 
-                    new CPU("Core i9-13900K", cpu, "Intel", "LGA1700", 6000, 6200, false, false),
-                    new CPU("Core i7-13700K", cpu, "Intel", "LGA1700", 5600, 5800, false, false),
-                    new CPU("Core i5-13600K", cpu, "Intel", "LGA1700", 5100, 5500, false, false),
-                    new CPU("Core i5-13500", cpu, "Intel", "LGA1700", 5000, 5400, false, false),
-                    new CPU("Core i5-13400", cpu, "Intel", "LGA1700", 4600, 5000, false, false)
+                    new CPU("i9 13900K", cpu, "Intel", "LGA1700", 6000, 6200, false, false),
+                    new CPU("i7 13700K", cpu, "Intel", "LGA1700", 5600, 5800, false, false),
+                    new CPU("i5 13600K", cpu, "Intel", "LGA1700", 5100, 5500, false, false),
+                    new CPU("i5 13500", cpu, "Intel", "LGA1700", 5000, 5400, false, false),
+                    new CPU("i5 13400", cpu, "Intel", "LGA1700", 4600, 5000, false, false)
             };
 
 
