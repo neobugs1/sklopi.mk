@@ -43,6 +43,8 @@ public class ScrapingRunner implements CommandLineRunner {
     private SetecCPUScraperService setecCPUScraperService;
     @Autowired
     private SetecMotherboardScraperService setecMotherboardScraperService;
+    @Autowired
+    private com.example.sklopi.scraping.newwebsite.SetecRAMScraperService setecRAMScraperService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -50,7 +52,8 @@ public class ScrapingRunner implements CommandLineRunner {
 
 //        setecGPUScraperService.scrapeAndSaveGPUs();
 //        anhochCpuScraperService.scrapeAndSaveCPUs();
-        setecCPUScraperService.scrapeAndSaveCPUs();
+//        setecCPUScraperService.scrapeAndSaveCPUs();
 //        setecMotherboardScraperService.scrapeAndSaveMotherboards();
+        setecRAMScraperService.scrapeAndSaveRAMs();
     }
 }
