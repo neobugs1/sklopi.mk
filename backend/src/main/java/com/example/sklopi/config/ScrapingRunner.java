@@ -47,6 +47,8 @@ public class ScrapingRunner implements CommandLineRunner {
     private SetecHDDScraperService setecHDDScraperService;
     @Autowired
     private SetecSSDScraperService setecSSDScraperService;
+    @Autowired
+    private SetecM2SSDScraperService setecM2SSDScraperService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -58,6 +60,7 @@ public class ScrapingRunner implements CommandLineRunner {
 //        setecMotherboardScraperService.scrapeAndSaveMotherboards();
 //        setecRAMScraperService.scrapeAndSaveRAMs();
 //        setecHDDScraperService.scrapeAndSaveHDDs();
-        setecSSDScraperService.scrapeAndSave25InchSSDs();
+//        setecSSDScraperService.scrapeAndSave25InchSSDs();
+        setecM2SSDScraperService.scrapeAndSaveM2SSDs();
     }
 }

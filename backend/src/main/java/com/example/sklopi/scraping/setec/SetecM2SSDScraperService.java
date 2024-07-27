@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class SetecSSDScraperService {
+public class SetecM2SSDScraperService {
 
     @Autowired
     private PartService partService;
@@ -36,7 +36,7 @@ public class SetecSSDScraperService {
     @Autowired
     private ProductService productService;
 
-    public void scrapeAndSave25InchSSDs() {
+    public void scrapeAndSaveM2SSDs() {
         System.setProperty("webdriver.chrome.driver", "C:\\ChromeDriver\\chromedriver.exe");
 
         ChromeOptions options = new ChromeOptions();
@@ -45,7 +45,7 @@ public class SetecSSDScraperService {
         WebDriver driver = new ChromeDriver(options);
 
         try {
-            driver.get("https://setec.mk/компјутери-и-it-опрема/компјутери-и-компјутерски-делови/тврди-дискови-и-ssd-дискови?mfp=111-form-factor%5BSATA%5D&limit=100");
+            driver.get("https://setec.mk/компјутери-и-it-опрема/компјутери-и-компјутерски-делови/тврди-дискови-и-ssd-дискови?limit=100&mfp=111-form-factor[m.2]");
 
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product")));
@@ -56,6 +56,7 @@ public class SetecSSDScraperService {
                 System.out.println("No elements found with the selector .product");
             } else {
                 List<String> knownBrands = scrapeBrands(driver);
+                List<String> ignoreNames = List.of("ADATA 480GB SSD", "ADATA 256GB SSD", "ADATA 512GB SSD", "ADATA 1TB SSD", "ADATA 1024GB SSD", "ADATA 2TB SSD"); // Ignore
 
                 Part ssdPart = partService.findByName("Storage").orElseGet(() -> {
                     Part newPart = new Part();
@@ -87,6 +88,12 @@ public class SetecSSDScraperService {
                     String productUrl = ssdElement.findElement(By.cssSelector(".name a")).getAttribute("href");
                     String name = ssdElement.findElement(By.cssSelector(".name a")).getText();
 
+                    // Погрешно ставени имиња во М2 делот
+                    if (ignoreNames.stream().anyMatch(name::contains)) {
+                        System.out.println("Skipped product (ignored name): " + name);
+                        continue;
+                    }
+
                     WebElement priceElement = null;
                     try {
                         priceElement = ssdElement.findElement(By.cssSelector(".category-price-akciska .price-new-new"));
@@ -99,7 +106,7 @@ public class SetecSSDScraperService {
                         }
                     }
 
-                    String formFactor = "2.5\"";
+                    String formFactor = "M.2";
                     String brand = determineBrand(name, knownBrands);
                     int capacity = determineCapacity(name);
                     String type = "SSD";
