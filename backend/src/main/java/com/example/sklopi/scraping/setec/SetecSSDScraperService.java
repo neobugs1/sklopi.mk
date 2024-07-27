@@ -18,13 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-public class SetecHDDScraperService {
+public class SetecSSDScraperService {
 
     @Autowired
     private PartService partService;
@@ -35,7 +36,7 @@ public class SetecHDDScraperService {
     @Autowired
     private ProductService productService;
 
-    public void scrapeAndSaveHDDs() {
+    public void scrapeAndSave25InchSSDs() {
         System.setProperty("webdriver.chrome.driver", "C:\\ChromeDriver\\chromedriver.exe");
 
         ChromeOptions options = new ChromeOptions();
@@ -44,17 +45,19 @@ public class SetecHDDScraperService {
         WebDriver driver = new ChromeDriver(options);
 
         try {
-            driver.get("https://setec.mk/компјутери-и-it-опрема/компјутери-и-компјутерски-делови/тврди-дискови-и-ssd-дискови?mfp=111-form-factor[3.5%20инчи],93-[HDD]");
+            driver.get("https://setec.mk/компјутери-и-it-опрема/компјутери-и-компјутерски-делови/тврди-дискови-и-ssd-дискови?mfp=111-form-factor%5BSATA%5D&limit=100");
 
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product")));
 
-            List<WebElement> hddElements = driver.findElements(By.cssSelector(".product"));
+            List<WebElement> ssdElements = driver.findElements(By.cssSelector(".product"));
 
-            if (hddElements.isEmpty()) {
+            if (ssdElements.isEmpty()) {
                 System.out.println("No elements found with the selector .product");
             } else {
-                Part hddPart = partService.findByName("Storage").orElseGet(() -> {
+                List<String> knownBrands = scrapeBrands(driver);
+
+                Part ssdPart = partService.findByName("Storage").orElseGet(() -> {
                     Part newPart = new Part();
                     newPart.setName("Storage");
                     return partService.savePart(newPart);
@@ -62,8 +65,8 @@ public class SetecHDDScraperService {
 
                 JavascriptExecutor js = (JavascriptExecutor) driver;
 
-                for (WebElement hddElement : hddElements) {
-                    js.executeScript("arguments[0].scrollIntoView(true);", hddElement);
+                for (WebElement ssdElement : ssdElements) {
+                    js.executeScript("arguments[0].scrollIntoView(true);", ssdElement);
                     Thread.sleep(200);
 
                     wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".image .zoom-image-effect")));
@@ -71,7 +74,7 @@ public class SetecHDDScraperService {
 
                     WebElement stockElement;
                     try {
-                        stockElement = hddElement.findElement(By.cssSelector(".lager div"));
+                        stockElement = ssdElement.findElement(By.cssSelector(".lager div"));
                     } catch (org.openqa.selenium.NoSuchElementException e) {
                         continue;
                     }
@@ -80,32 +83,33 @@ public class SetecHDDScraperService {
                         continue;
                     }
 
-                    String imageUrl = hddElement.findElement(By.cssSelector(".image .zoom-image-effect")).getAttribute("src");
-                    String productUrl = hddElement.findElement(By.cssSelector(".name a")).getAttribute("href");
-                    String name = hddElement.findElement(By.cssSelector(".name a")).getText();
+                    String imageUrl = ssdElement.findElement(By.cssSelector(".image .zoom-image-effect")).getAttribute("src");
+                    String productUrl = ssdElement.findElement(By.cssSelector(".name a")).getAttribute("href");
+                    String name = ssdElement.findElement(By.cssSelector(".name a")).getText();
 
                     WebElement priceElement = null;
                     try {
-                        priceElement = hddElement.findElement(By.cssSelector(".category-price-akciska .price-new-new"));
+                        priceElement = ssdElement.findElement(By.cssSelector(".category-price-akciska .price-new-new"));
                     } catch (org.openqa.selenium.NoSuchElementException e) {
                         try {
-                            priceElement = hddElement.findElement(By.cssSelector(".category-price-redovna .cena_za_kesh"));
+                            priceElement = ssdElement.findElement(By.cssSelector(".category-price-redovna .cena_za_kesh"));
                         } catch (org.openqa.selenium.NoSuchElementException e1) {
                             System.out.println("Price not found for product: " + name);
                             continue;
                         }
                     }
 
-                    String brand = determineBrand(name);
+                    String formFactor = "2.5\""; // Fixed form factor for this scraper
+                    String brand = determineBrand(name, knownBrands);
                     int capacity = determineCapacity(name);
-                    String type = "HDD"; // Set the type to HDD
+                    String type = "SSD"; // Set the type to SSD
 
                     if (priceElement != null) {
                         String priceString = priceElement.getText().trim();
                         String cleanedPriceString = priceString.replace(" Ден.", "").replace(",", "");
                         int price = Integer.parseInt(cleanedPriceString);
                         if (brand != null && capacity > 0) {
-                            Optional<Storage> partModel = determineAndSavePartModel(name, hddPart, brand, capacity, type);
+                            Optional<Storage> partModel = determineAndSavePartModel(name, ssdPart, formFactor, brand, capacity, type);
 
                             if (partModel.isPresent()) {
                                 Product product = new Product();
@@ -113,7 +117,7 @@ public class SetecHDDScraperService {
                                 product.setImageUrl(imageUrl);
                                 product.setProductUrl(productUrl);
                                 product.setPrice(price);
-                                product.setPart(hddPart);
+                                product.setPart(ssdPart);
                                 product.setPartModel(partModel.get());
 
                                 productService.saveProduct(product);
@@ -134,10 +138,30 @@ public class SetecHDDScraperService {
         }
     }
 
-    private String determineBrand(String productName) {
-        String[] words = productName.split(" ");
-        if (words.length >= 3) {
-            return words[2]; // Assuming the brand is the third word
+    private List<String> scrapeBrands(WebDriver driver) {
+        List<String> brands = new ArrayList<>();
+        List<WebElement> brandElements = driver.findElements(By.cssSelector(".mfilter-options-container label"));
+        for (WebElement brandElement : brandElements) {
+            String forAttribute = brandElement.getAttribute("for");
+            if (forAttribute != null && forAttribute.contains("manufacturers")) {
+                String brandName = brandElement.getText().trim();
+                if (!brandName.isEmpty()) {
+                    brands.add(brandName);
+                }
+            }
+        }
+        return brands;
+    }
+
+    private String determineBrand(String productName, List<String> knownBrands) {
+        if (productName.toLowerCase().contains("hyperx")) {
+            return "Kingston";
+        }
+        String lowerCaseProductName = productName.toLowerCase();
+        for (String brand : knownBrands) {
+            if (lowerCaseProductName.contains(brand.toLowerCase())) {
+                return brand;
+            }
         }
         return null;
     }
@@ -155,16 +179,17 @@ public class SetecHDDScraperService {
         return 0;
     }
 
-    private Optional<Storage> determineAndSavePartModel(String productName, Part hddPart, String brand, int capacity, String type) {
+    private Optional<Storage> determineAndSavePartModel(String productName, Part ssdPart, String formFactor, String brand, int capacity, String type) {
         List<Storage> partModels = storageService.findAll();
 
         for (Storage model : partModels) {
-            if (model.getName().equals(brand) && model.getCapacity() == capacity && model.getType().equals(type)) {
+            if (model.getFormFactor().equals(formFactor) && model.getName().equals(brand) &&
+                    model.getCapacity() == capacity && model.getType().equals(type)) {
                 return Optional.of(model);
             }
         }
 
-        Storage newStorage = new Storage(brand, hddPart, "3.5\"", capacity, type);
+        Storage newStorage = new Storage(brand, ssdPart, formFactor, capacity, type);
         return Optional.of(storageService.save(newStorage));
     }
 }
