@@ -2,10 +2,10 @@ package com.example.sklopi.scraping.setec;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.Product;
-import com.example.sklopi.model.parts.CPUCooler;
+import com.example.sklopi.model.parts.PcCase;
 import com.example.sklopi.service.PartService;
 import com.example.sklopi.service.ProductService;
-import com.example.sklopi.service.parts.CPUCoolerService;
+import com.example.sklopi.service.parts.PcCaseService;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -23,18 +23,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class SetecCPUCoolerScraperService {
+public class SetecPcCaseScraperService {
 
     @Autowired
     private PartService partService;
 
     @Autowired
-    private CPUCoolerService cpuCoolerService;
+    private PcCaseService pcCaseService;
 
     @Autowired
     private ProductService productService;
 
-    public void scrapeAndSaveCPUCoolers() {
+    public void scrapeAndSavePcCases() {
         System.setProperty("webdriver.chrome.driver", "C:\\ChromeDriver\\chromedriver.exe");
 
         ChromeOptions options = new ChromeOptions();
@@ -43,32 +43,29 @@ public class SetecCPUCoolerScraperService {
         WebDriver driver = new ChromeDriver(options);
 
         try {
-            driver.get("https://setec.mk/компјутери-и-it-опрема/компјутери-и-компјутерски-делови/кулери?mfp=price%5B1300%2C58999%5D&limit=100");
+            driver.get("https://setec.mk/компјутери-и-it-опрема/компјутери-и-компјутерски-делови/куќишта?limit=150&mfp=price[1390,59999]");
 
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product")));
 
-            List<WebElement> coolerElements = driver.findElements(By.cssSelector(".product"));
+            List<WebElement> caseElements = driver.findElements(By.cssSelector(".product"));
 
-            if (coolerElements.isEmpty()) {
+            if (caseElements.isEmpty()) {
                 System.out.println("No elements found with the selector .product");
             } else {
                 List<String> knownBrands = scrapeBrands(driver);
-                List<String> ignoreKeywords = List.of("120", "140", "200", "CONTROLLER", "SSD"); //ignorirame FANS i RGB Controllers
+                List<String> ignoreKeywords = List.of("ITX", "NCORE", "F129A", "Controller", "Raspberry");
 
-                // Dodadi brendovi sto ne se izlistani
-                knownBrands.add("NZXT");
-
-                Part coolerPart = partService.findByName("CPU Cooler").orElseGet(() -> {
+                Part casePart = partService.findByName("PC Case").orElseGet(() -> {
                     Part newPart = new Part();
-                    newPart.setName("CPU Cooler");
+                    newPart.setName("PC Case");
                     return partService.savePart(newPart);
                 });
 
                 JavascriptExecutor js = (JavascriptExecutor) driver;
 
-                for (WebElement coolerElement : coolerElements) {
-                    js.executeScript("arguments[0].scrollIntoView(true);", coolerElement);
+                for (WebElement caseElement : caseElements) {
+                    js.executeScript("arguments[0].scrollIntoView(true);", caseElement);
                     Thread.sleep(200);
 
                     wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".image .zoom-image-effect")));
@@ -76,7 +73,7 @@ public class SetecCPUCoolerScraperService {
 
                     WebElement stockElement;
                     try {
-                        stockElement = coolerElement.findElement(By.cssSelector(".lager div"));
+                        stockElement = caseElement.findElement(By.cssSelector(".lager div"));
                     } catch (org.openqa.selenium.NoSuchElementException e) {
                         continue;
                     }
@@ -85,10 +82,11 @@ public class SetecCPUCoolerScraperService {
                         continue;
                     }
 
-                    String imageUrl = coolerElement.findElement(By.cssSelector(".image .zoom-image-effect")).getAttribute("src");
-                    String productUrl = coolerElement.findElement(By.cssSelector(".name a")).getAttribute("href");
-                    String name = coolerElement.findElement(By.cssSelector(".name a")).getText();
+                    String imageUrl = caseElement.findElement(By.cssSelector(".image .zoom-image-effect")).getAttribute("src");
+                    String productUrl = caseElement.findElement(By.cssSelector(".name a")).getAttribute("href");
+                    String name = caseElement.findElement(By.cssSelector(".name a")).getText();
 
+                    // Skip cases with specified keywords
                     if (ignoreKeywords.stream().anyMatch(name::contains)) {
                         System.out.println("Skipped product (ignored keyword): " + name);
                         continue;
@@ -96,10 +94,10 @@ public class SetecCPUCoolerScraperService {
 
                     WebElement priceElement = null;
                     try {
-                        priceElement = coolerElement.findElement(By.cssSelector(".category-price-akciska .price-new-new"));
+                        priceElement = caseElement.findElement(By.cssSelector(".category-price-akciska .price-new-new"));
                     } catch (org.openqa.selenium.NoSuchElementException e) {
                         try {
-                            priceElement = coolerElement.findElement(By.cssSelector(".category-price-redovna .cena_za_kesh"));
+                            priceElement = caseElement.findElement(By.cssSelector(".category-price-redovna .cena_za_kesh"));
                         } catch (org.openqa.selenium.NoSuchElementException e1) {
                             System.out.println("Price not found for product: " + name);
                             continue;
@@ -107,14 +105,14 @@ public class SetecCPUCoolerScraperService {
                     }
 
                     String brand = determineBrand(name, knownBrands);
-                    String coolerType = determineCoolerType(name);
+                    String formFactor = determineFormFactor(name);
 
                     if (priceElement != null && brand != null) {
                         String priceString = priceElement.getText().trim();
                         String cleanedPriceString = priceString.replace(" Ден.", "").replace(",", "");
                         int price = Integer.parseInt(cleanedPriceString);
 
-                        Optional<CPUCooler> partModel = determineAndSavePartModel(name, coolerPart, brand, coolerType);
+                        Optional<PcCase> partModel = determineAndSavePartModel(name, casePart, brand, formFactor);
 
                         if (partModel.isPresent()) {
                             Product product = new Product();
@@ -122,7 +120,7 @@ public class SetecCPUCoolerScraperService {
                             product.setImageUrl(imageUrl);
                             product.setProductUrl(productUrl);
                             product.setPrice(price);
-                            product.setPart(coolerPart);
+                            product.setPart(casePart);
                             product.setPartModel(partModel.get());
 
                             productService.saveProduct(product);
@@ -172,26 +170,23 @@ public class SetecCPUCoolerScraperService {
         return null;
     }
 
-    private String determineCoolerType(String productName) {
+
+    private String determineFormFactor(String productName) {
         String lowerCaseProductName = productName.toLowerCase();
-        if (lowerCaseProductName.contains("lc") || lowerCaseProductName.contains("liquid")
-                || lowerCaseProductName.contains("ryuo") || lowerCaseProductName.contains("ryujin")
-                || lowerCaseProductName.contains("kraken")) {
-            return "Liquid";
+        if (lowerCaseProductName.contains("e-atx") || lowerCaseProductName.contains("eatx")) {
+            return "E-ATX";
+        } else if (lowerCaseProductName.contains("micro") || lowerCaseProductName.contains("m-atx") || lowerCaseProductName.contains("qube") || lowerCaseProductName.contains("mini")) {
+            return "mATX";
+        } else {
+            return "ATX";
         }
-        return "Air";
     }
 
-    private Optional<CPUCooler> determineAndSavePartModel(String productName, Part coolerPart, String brand, String coolerType) {
-        List<CPUCooler> partModels = cpuCoolerService.findAll();
-
-        for (CPUCooler model : partModels) {
-            if (model.getName().equalsIgnoreCase(brand) && model.getCoolerType().equalsIgnoreCase(coolerType)) {
-                return Optional.of(model);
-            }
-        }
-
-        CPUCooler newCooler = new CPUCooler(brand, coolerPart, coolerType);
-        return Optional.of(cpuCoolerService.save(newCooler));
+    private Optional<PcCase> determineAndSavePartModel(String productName, Part casePart, String brand, String formFactor) {
+        return pcCaseService.findByBrandAndFormFactor(brand, formFactor)
+                .or(() -> {
+                    PcCase newCase = new PcCase(casePart, brand, formFactor);
+                    return Optional.of(pcCaseService.save(newCase));
+                });
     }
 }
