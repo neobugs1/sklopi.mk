@@ -2,9 +2,9 @@ import { Box, Flex } from "@chakra-ui/react";
 import { Route, Routes } from "react-router-dom";
 import Header from "./components/Header";
 import Nav from "./components/Nav";
-import Hero from "./components/Hero";
-import FeaturedParts from "./components/FeaturedParts";
 import Footer from "./components/Footer";
+import Builder from "./components/Builder";
+import Home from "./components/Home";
 
 const App = () => (
   <Box>
@@ -13,12 +13,11 @@ const App = () => (
     <Flex bg={"gray.700"} flexDir={"column"} pb={8}>
       <Flex flexDir={"column"} w={"80%"} mx={"auto"} mt={8}>
         <Routes>
-          <Route path="/" element={<Hero />} />
-          {/* Placeholder for future pages */}
-          <Route path="/builder" element={<div>System Builder</div>} />
-          <Route path="/products" element={<div>Browse Products</div>} />
+          <Route exact path="/" element={<Home />} />
+          <Route path="/builder" element={<Builder />} />
+          {/* <Route path="/products" element={<div>Browse Products</div>} />
           <Route path="/builds" element={<div>Completed Builds</div>} />
-          <Route path="/guide" element={<div>Build Guides</div>} />
+          <Route path="/guide" element={<div>Build Guides</div>} /> */}
         </Routes>
       </Flex>
     </Flex>

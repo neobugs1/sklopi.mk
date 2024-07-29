@@ -1,9 +1,9 @@
-import { Box, Heading, Text } from "@chakra-ui/react";
+import { Box, Heading, Text, useColorModeValue } from "@chakra-ui/react";
 
 const Header = () => (
-  <Box bg="gray.800" color="gray.100" p={4} textAlign="center">
-    <Heading as="h1">Sklopi.mk</Heading>
-    <Text></Text>
+  <Box as="header" bg={"#6200EA"} color="white" py={4} textAlign="center">
+    <Heading as="h1">sklopi.mk</Heading>
+    <Text>Едноставно склопи го својот омилен компјутер</Text>
   </Box>
 );
 
