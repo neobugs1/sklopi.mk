@@ -25,7 +25,7 @@ function Home() {
           overflow="hidden"
           position="relative"
         >
-          <Box className="home-content" position="relative" zIndex="1">
+          <Box className="home-content" position="absolute" zIndex="1">
             <Heading as="h2">Склопи го својот совршен систем</Heading>
             <Text mb={6}>Изберете од илјадници компоненти и го составете го вашиот компјутер</Text>
             <Link

@@ -5,6 +5,7 @@ import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import Builder from "./components/Builder";
 import Home from "./components/Home";
+import Motherboards from "./components/Motherboards";
 
 const App = () => (
   <Box>
@@ -15,6 +16,7 @@ const App = () => (
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route path="/builder" element={<Builder />} />
+          <Route path="/motherboards/products" element={<Motherboards />} />
           {/* <Route path="/products" element={<div>Browse Products</div>} />
           <Route path="/builds" element={<div>Completed Builds</div>} />
           <Route path="/guide" element={<div>Build Guides</div>} /> */}
