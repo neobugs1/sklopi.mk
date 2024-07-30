@@ -3,6 +3,7 @@ package com.example.sklopi.model.parts;
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.PartModel;
 import com.example.sklopi.model.Product;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ public class Motherboard extends PartModel {
     private String supportedMemory; // DDR4, DDR5, etc.
 
     @OneToMany(mappedBy = "partModel")
+    @JsonIgnore
     private List<Product> products;
 
     public Motherboard(String name, Part part, String socket, String formFactor, String supportedMemory) {

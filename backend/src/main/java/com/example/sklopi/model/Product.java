@@ -1,5 +1,6 @@
 package com.example.sklopi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,7 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "part_model_id")
+    @JsonIgnoreProperties({"products"})
     private PartModel partModel;
 
     @PrePersist

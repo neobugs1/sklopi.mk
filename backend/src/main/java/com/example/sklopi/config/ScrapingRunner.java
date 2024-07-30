@@ -58,7 +58,7 @@ public class ScrapingRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        productService.setAllProductsOutOfStock();
+//        productService.setAllProductsOutOfStock();
 
 //        setecGPUScraperService.scrapeAndSaveGPUs();
 //        anhochCpuScraperService.scrapeAndSaveCPUs();
@@ -70,6 +70,6 @@ public class ScrapingRunner implements CommandLineRunner {
 //        setecM2SSDScraperService.scrapeAndSaveM2SSDs();
 //        setecCPUCoolerScraperService.scrapeAndSaveCPUCoolers();
 //        setecPcCaseScraperService.scrapeAndSavePcCases();
-        setecPSUScraperService.scrapeAndSavePSUs();
+//        setecPSUScraperService.scrapeAndSavePSUs();
     }
 }
