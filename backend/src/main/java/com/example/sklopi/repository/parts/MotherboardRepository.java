@@ -19,7 +19,7 @@ public interface MotherboardRepository extends JpaRepository<Motherboard, Long>,
     List<String> findDistinctFormFactors();
 
     @Query("SELECT DISTINCT m.name FROM Motherboard m")
-    List<String> findDistinctNames();
+    List<String> findDistinctChipsets();
 
     @Query("SELECT DISTINCT m.supportedMemory FROM Motherboard m")
     List<String> findDistinctSupportedMemory();

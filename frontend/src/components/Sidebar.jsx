@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Heading, Checkbox, VStack, RangeSlider, RangeSliderTrack, RangeSliderFilledTrack, RangeSliderThumb, Text, HStack } from "@chakra-ui/react";
 
-const Sidebar = ({ filters, setFilters, minPrice, maxPrice, distinctSockets, distinctFormFactors, distinctSupportedMemory }) => {
+const Sidebar = ({ filters, setFilters, minPrice, maxPrice, distinctChipsets, distinctSockets, distinctFormFactors, distinctSupportedMemory }) => {
   const [priceRange, setPriceRange] = useState([minPrice, maxPrice]);
 
   useEffect(() => {
@@ -31,6 +31,16 @@ const Sidebar = ({ filters, setFilters, minPrice, maxPrice, distinctSockets, dis
       </Heading>
 
       <VStack spacing={4}>
+        <Box>
+          <Heading as="h4" size="sm">
+            Chipsets
+          </Heading>
+          {distinctChipsets?.map((chipset) => (
+            <Checkbox key={chipset} name="chipset" value={chipset} onChange={handleCheckboxChange}>
+              {chipset}
+            </Checkbox>
+          ))}
+        </Box>
         <Box>
           <Heading as="h4" size="sm">
             Form Factor

@@ -14,6 +14,7 @@ const Motherboards = () => {
   const [distinctFilters, setDistinctFilters] = useState({
     minPrice: 0,
     maxPrice: 10000,
+    distinctChipsets: [],
     distinctSockets: [],
     distinctFormFactors: [],
     distinctSupportedMemory: [],
@@ -29,6 +30,7 @@ const Motherboards = () => {
     setDistinctFilters({
       minPrice: data.minPrice,
       maxPrice: data.maxPrice,
+      distinctChipsets: data.distinctChipsets || [],
       distinctSockets: data.distinctSockets || [],
       distinctFormFactors: data.distinctFormFactors || [],
       distinctSupportedMemory: data.distinctSupportedMemory || [],
@@ -42,6 +44,7 @@ const Motherboards = () => {
         setFilters={setFilters}
         minPrice={distinctFilters.minPrice}
         maxPrice={distinctFilters.maxPrice}
+        distinctChipsets={distinctFilters.distinctChipsets}
         distinctSockets={distinctFilters.distinctSockets}
         distinctFormFactors={distinctFilters.distinctFormFactors}
         distinctSupportedMemory={distinctFilters.distinctSupportedMemory}

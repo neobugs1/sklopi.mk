@@ -85,6 +85,7 @@ public class ProductController {
         response.put("size", products.getSize());
         response.put("minPrice", productRepository.findMinPrice());
         response.put("maxPrice", productRepository.findMaxPrice());
+        response.put("distinctChipsets", motherboardRepository.findDistinctChipsets());
         response.put("distinctFormFactors", motherboardRepository.findDistinctFormFactors());
         response.put("distinctSupportedMemory", motherboardRepository.findDistinctSupportedMemory());
         response.put("distinctSockets", motherboardRepository.findDistinctSockets());

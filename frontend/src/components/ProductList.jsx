@@ -17,7 +17,7 @@ const ProductList = ({ filters }) => {
     const response = await fetch(
       `http://localhost:8080/api/products/motherboards?page=${currentPage}&size=10&minPrice=${filters.priceRange[0]}&maxPrice=${
         filters.priceRange[1]
-      }&sortBy=${sort}&name=${filters.name.join(",")}&socket=${filters.socket.join(",")}&supportedMemory=${filters.supportedMemory.join(
+      }&sortBy=${sort}&name=${filters.chipset.join(",")}&socket=${filters.socket.join(",")}&supportedMemory=${filters.supportedMemory.join(
         ","
       )}&formFactor=${filters.formFactor.join(",")}`
     );
@@ -37,8 +37,9 @@ const ProductList = ({ filters }) => {
           <HStack>
             <Text>Подреди по:</Text>
             <Select id="sort" value={sort} onChange={(e) => setSort(e.target.value)}>
-              <option value="price">Цена (Најниска прво)</option>
-              <option value="rating">Оценка (Највисока прво)</option>
+              <option value="price asc">Цена (Најниска прво)</option>
+              <option value="price desc">Оценка (Највисока прво)</option>
+              <option value="name">Име (А-Ш)</option>
               <option value="name">Име (А-Ш)</option>
             </Select>
           </HStack>
