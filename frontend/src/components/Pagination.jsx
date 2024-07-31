@@ -9,7 +9,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
+    if (currentPage < totalPages - 1) {
       onPageChange(currentPage + 1);
     }
   };
@@ -20,7 +20,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         Предходна
       </Button>
       <Text>
-        {currentPage} од {totalPages}
+        {currentPage + 1} од {totalPages}
       </Text>
       <Button onClick={handleNextPage} disabled={currentPage === totalPages}>
         Следна

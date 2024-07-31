@@ -1,28 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { Box, Table, Thead, Tbody, Tr, Th, Td, Select, Button, Text, VStack, HStack } from "@chakra-ui/react";
+import { Box, Table, Thead, Tbody, Tr, Th, Td, Select, Text, VStack, HStack } from "@chakra-ui/react";
 import ProductItem from "./ProductItem";
 import Pagination from "./Pagination";
 
-const ProductList = () => {
+const ProductList = ({ filters }) => {
   const [products, setProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [sort, setSort] = useState("price");
 
   useEffect(() => {
     fetchProducts();
-  }, [currentPage, sort]);
+  }, [currentPage, sort, filters]);
 
   const fetchProducts = async () => {
-    const response = await fetch(`http://localhost:8080/api/motherboards?page=${currentPage}`);
+    const response = await fetch(
+      `http://localhost:8080/api/products/motherboards?page=${currentPage}&size=10&minPrice=${filters.priceRange[0]}&maxPrice=${
+        filters.priceRange[1]
+      }&sortBy=${sort}&name=${filters.name.join(",")}&socket=${filters.socket.join(",")}&supportedMemory=${filters.supportedMemory.join(
+        ","
+      )}&formFactor=${filters.formFactor.join(",")}`
+    );
     const data = await response.json();
 
-    setProducts(data.items); // Set products
-    setTotalPages(data.totalPages); // Set total pages
+    setProducts(data.products); // Adjusted to match the API response format
+    setTotalPages(data.totalPages);
   };
 
   return (
-    <Box className="product-list" bg="var(--filter-bg)" borderRadius="8px" p="15px">
+    <Box flex="1">
       <VStack align="start" spacing={4}>
         <HStack justify="space-between" w="full">
           <Text fontSize="2xl" color="var(--secondary-color)">
