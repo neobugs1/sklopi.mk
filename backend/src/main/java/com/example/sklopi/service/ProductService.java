@@ -11,9 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,27 +66,25 @@ public class ProductService {
         }
     }
 
-    public Page<Product> getProducts(String name, Integer price, Long partModelId, int page, int size, String sortBy, String direction) {
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), sortBy);
-        return productRepository.findAll((root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
+    public Map<String, Object> getFilteredProducts(
+            Class<? extends PartModel> partModelType,
+            List<String> name,
+            Map<String, List<String>> attributes,
+            Double minPrice,
+            Double maxPrice,
+            String sortBy,
+            Pageable pageable) {
 
-            if (name != null) {
-                predicates.add(criteriaBuilder.like(root.get("name"), "%" + name + "%"));
-            }
-            if (price != null) {
-                predicates.add(criteriaBuilder.equal(root.get("price"), price));
-            }
-            if (partModelId != null) {
-                predicates.add(criteriaBuilder.equal(root.join("partModel").get("id"), partModelId));
-            }
+        Page<Product> products = productRepository.findFilteredProducts(
+                partModelType, name, attributes, minPrice, maxPrice, sortBy, pageable);
 
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        }, pageable);
+        Map<String, Object> response = new HashMap<>();
+        response.put("products", products.getContent());
+        response.put("totalElements", products.getTotalElements());
+        response.put("totalPages", products.getTotalPages());
+        response.put("size", products.getSize());
+
+        return response;
     }
-
-//    public Page<Product> getFilteredProducts(String name, String socket, String supportedMemory, String formFactor, Pageable pageable) {
-//        return productRepository.findFilteredProducts(name, socket, supportedMemory, formFactor, pageable);
-//    }
 }
 

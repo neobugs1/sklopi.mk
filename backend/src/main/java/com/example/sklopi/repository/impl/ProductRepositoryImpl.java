@@ -1,5 +1,6 @@
 package com.example.sklopi.repository.impl;
 
+import com.example.sklopi.model.PartModel;
 import com.example.sklopi.repository.custom.ProductRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import com.example.sklopi.model.Product;
 
 import java.util.List;
+import java.util.Map;
 
 public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
@@ -17,21 +19,27 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     private EntityManager entityManager;
 
     @Override
-    public Page<Product> findFilteredProducts(List<String> names, List<String> sockets, List<String> supportedMemories, List<String> formFactors, Double minPrice, Double maxPrice, String sortBy, Pageable pageable) {
-        StringBuilder queryBuilder = new StringBuilder("SELECT p FROM Product p JOIN p.partModel pm WHERE TYPE(pm) = Motherboard");
+    public Page<Product> findFilteredProducts(
+            Class<? extends PartModel> partModelType,
+            List<String> names,
+            Map<String, List<String>> attributes,
+            Double minPrice,
+            Double maxPrice,
+            String sortBy,
+            Pageable pageable) {
+
+        StringBuilder queryBuilder = new StringBuilder("SELECT p FROM Product p JOIN p.partModel pm WHERE TYPE(pm) = :partModelType");
 
         if (names != null && !names.isEmpty()) {
             queryBuilder.append(" AND pm.name IN :names");
         }
-        if (sockets != null && !sockets.isEmpty()) {
-            queryBuilder.append(" AND pm.socket IN :sockets");
+
+        for (Map.Entry<String, List<String>> entry : attributes.entrySet()) {
+            if (entry.getValue() != null && !entry.getValue().isEmpty()) {
+                queryBuilder.append(" AND pm.").append(entry.getKey()).append(" IN :").append(entry.getKey());
+            }
         }
-        if (supportedMemories != null && !supportedMemories.isEmpty()) {
-            queryBuilder.append(" AND pm.supportedMemory IN :supportedMemories");
-        }
-        if (formFactors != null && !formFactors.isEmpty()) {
-            queryBuilder.append(" AND pm.formFactor IN :formFactors");
-        }
+
         if (minPrice != null) {
             queryBuilder.append(" AND p.price >= :minPrice");
         }
@@ -45,19 +53,18 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         }
 
         TypedQuery<Product> query = entityManager.createQuery(queryBuilder.toString(), Product.class);
+        query.setParameter("partModelType", partModelType);
 
         if (names != null && !names.isEmpty()) {
             query.setParameter("names", names);
         }
-        if (sockets != null && !sockets.isEmpty()) {
-            query.setParameter("sockets", sockets);
+
+        for (Map.Entry<String, List<String>> entry : attributes.entrySet()) {
+            if (entry.getValue() != null && !entry.getValue().isEmpty()) {
+                query.setParameter(entry.getKey(), entry.getValue());
+            }
         }
-        if (supportedMemories != null && !supportedMemories.isEmpty()) {
-            query.setParameter("supportedMemories", supportedMemories);
-        }
-        if (formFactors != null && !formFactors.isEmpty()) {
-            query.setParameter("formFactors", formFactors);
-        }
+
         if (minPrice != null) {
             query.setParameter("minPrice", minPrice);
         }
@@ -74,3 +81,4 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return new PageImpl<>(resultList, pageable, totalRows);
     }
 }
+

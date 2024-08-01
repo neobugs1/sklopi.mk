@@ -149,7 +149,7 @@ public class SetecRAMScraperService {
         String ramType = getRamType(productName);
 
         for (RAM model : partModels) {
-            if (model.getName().equals(ramType) && model.getAmount() == amount && model.getSize() == size && model.getFrequency() == frequency) {
+            if (model.getName().equals(ramType) && model.getAmount() == amount && model.getCapacity() == size && model.getFrequency() == frequency) {
                 return Optional.of(model);
             }
         }

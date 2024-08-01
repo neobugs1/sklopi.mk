@@ -1,11 +1,12 @@
 package com.example.sklopi.web;
 
 import com.example.sklopi.model.Product;
+import com.example.sklopi.model.parts.*;
 import com.example.sklopi.repository.ProductRepository;
 import com.example.sklopi.repository.parts.MotherboardRepository;
+import com.example.sklopi.repository.parts.RAMRepository;
 import com.example.sklopi.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -27,40 +28,13 @@ public class ProductController {
     @Autowired
     private MotherboardRepository motherboardRepository;
 
-//    @GetMapping
-//    public List<Product> getAllProducts() {
-//        return productService.getAllProducts();
-//    }
+    @Autowired
+    private RAMRepository ramRepository;
 
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable Long id) {
         return productService.getProductById(id);
     }
-
-    //    @PostMapping
-//    public Product createProduct(@RequestBody Product product) {
-//        return productService.save(product);
-//    }
-//
-//    @PutMapping("/{id}")
-//    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
-//        product.setId(id);
-//        return productService.save(product);
-////    }
-//    @GetMapping
-//    public Page<Product> getProducts(
-//            @RequestParam(required = false) String name,
-//            @RequestParam(required = false) Integer price,
-//            @RequestParam(required = false) Long partModelId,
-//            @RequestParam(required = false) Double minPrice,
-//            @RequestParam(required = false) Double maxPrice,
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "10") int size,
-//            @RequestParam(defaultValue = "name") String sortBy,
-//            @RequestParam(defaultValue = "asc") String direction
-//    ) {
-//        return productService.getProducts(name, price, partModelId, page, size, minPrice, maxPrice, sortBy, direction);
-//    }
 
     @GetMapping("/motherboards")
     public ResponseEntity<Map<String, Object>> getMotherboards(
@@ -75,24 +49,58 @@ public class ProductController {
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
+        Map<String, List<String>> attributes = new HashMap<>();
+        attributes.put("socket", socket);
+        attributes.put("supportedMemory", supportedMemory);
+        attributes.put("formFactor", formFactor);
 
-        Page<Product> products = productRepository.findFilteredProducts(name, socket, supportedMemory, formFactor, minPrice, maxPrice, sortBy, pageable);
+        Map<String, Object> response = productService.getFilteredProducts(
+                Motherboard.class, name, attributes, minPrice, maxPrice, sortBy, pageable);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("products", products.getContent());
-        response.put("totalElements", products.getTotalElements());
-        response.put("totalPages", products.getTotalPages());
-        response.put("size", products.getSize());
-        response.put("minPrice", productRepository.findMinPrice());
-        response.put("maxPrice", productRepository.findMaxPrice());
-        response.put("distinctChipsets", motherboardRepository.findDistinctChipsets());
-        response.put("distinctFormFactors", motherboardRepository.findDistinctFormFactors());
+        response.put("minPrice", motherboardRepository.findMinPrice());
+        response.put("maxPrice", motherboardRepository.findMaxPrice());
+
+        response.put("distinctFormFactor", motherboardRepository.findDistinctFormFactors());
+        response.put("distinctName", motherboardRepository.findDistinctChipsets());
         response.put("distinctSupportedMemory", motherboardRepository.findDistinctSupportedMemory());
-        response.put("distinctSockets", motherboardRepository.findDistinctSockets());
+        response.put("distinctSocket", motherboardRepository.findDistinctSockets());
 
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/ram")
+    public ResponseEntity<Map<String, Object>> getRam(
+            @RequestParam(required = false) List<String> name,
+            @RequestParam(required = false) List<String> type,
+            @RequestParam(required = false) List<String> capacity,
+            @RequestParam(required = false) List<String> speed,
+            @RequestParam(required = false) List<String> amount,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Map<String, List<String>> attributes = new HashMap<>();
+        attributes.put("type", type);
+        attributes.put("capacity", capacity);
+        attributes.put("frequency", speed);
+        attributes.put("amount", amount);
+
+        Map<String, Object> response = productService.getFilteredProducts(
+                RAM.class, name, attributes, minPrice, maxPrice, sortBy, pageable);
+
+        response.put("minPrice", ramRepository.findMinPrice());
+        response.put("maxPrice", ramRepository.findMaxPrice());
+
+        response.put("distinctName", ramRepository.findDistinctTypes());
+        response.put("distinctAmount", ramRepository.findDistinctAmounts());
+        response.put("distinctCapacity", ramRepository.findDistinctCapacities());
+        response.put("distinctSpeed", ramRepository.findDistinctSpeeds());
+
+        return ResponseEntity.ok(response);
+    }
 
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {

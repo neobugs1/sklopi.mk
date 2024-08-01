@@ -3,6 +3,7 @@ package com.example.sklopi.model.parts;
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.PartModel;
 import com.example.sklopi.model.Product;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RAM extends PartModel {
     private int amount; // broj na sticks
-    private int size; // in GB
+    private int capacity; // in GB
     private int frequency; // in MHz
 
     @OneToMany(mappedBy = "partModel")
@@ -28,10 +29,11 @@ public class RAM extends PartModel {
     public RAM(String name, Part part) {
         super(name, part);
     }
-    public RAM(String name, Part part, int amount, int size, int frequency) {
+
+    public RAM(String name, Part part, int amount, int capacity, int frequency) {
         super(name, part);
         this.amount = amount;
-        this.size = size;
+        this.capacity = capacity;
         this.frequency = frequency;
     }
 }

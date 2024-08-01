@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class ScrapingRunner implements CommandLineRunner {
 
     @Autowired
-    private AnhochGPUScraperService scraperService;
+    private AnhochGPUScraperService anhochGPUScraperService;
     @Autowired
     private AnhochCPUScraperService anhochCpuScraperService;
     @Autowired
@@ -58,18 +58,28 @@ public class ScrapingRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-//        productService.setAllProductsOutOfStock();
+        productService.setAllProductsOutOfStock();
 
-//        setecGPUScraperService.scrapeAndSaveGPUs();
-//        anhochCpuScraperService.scrapeAndSaveCPUs();
-//        setecCPUScraperService.scrapeAndSaveCPUs();
-//        setecMotherboardScraperService.scrapeAndSaveMotherboards();
-//        setecRAMScraperService.scrapeAndSaveRAMs();
-//        setecHDDScraperService.scrapeAndSaveHDDs();
-//        setecSSDScraperService.scrapeAndSave25InchSSDs();
-//        setecM2SSDScraperService.scrapeAndSaveM2SSDs();
-//        setecCPUCoolerScraperService.scrapeAndSaveCPUCoolers();
-//        setecPcCaseScraperService.scrapeAndSavePcCases();
-//        setecPSUScraperService.scrapeAndSavePSUs();
+        anhochGPUScraperService.scrapeAndSaveGPUs();
+        anhochCpuScraperService.scrapeAndSaveCPUs();
+        anhochMotherboardScraperService.scrapeAndSaveMotherboards();
+        anhochRamScraperService.scrapeAndSaveRAMs();
+        anhochSsdScraperService.scrapeAndSaveSSDs();
+        anhochHddScraperService.scrapeAndSaveHDDs();
+        anhochAirCoolerScraperService.scrapeAndSaveAirCoolers();
+        anhochLiquidCoolerScraperService.scrapeAndSaveLiquidCoolers();
+        anhochPcCaseScraperService.scrapeAndSaveCases();
+        anhochPsuScraperService.scrapeAndSavePSUs();
+
+        setecGPUScraperService.scrapeAndSaveGPUs();
+        setecCPUScraperService.scrapeAndSaveCPUs();
+        setecMotherboardScraperService.scrapeAndSaveMotherboards();
+        setecRAMScraperService.scrapeAndSaveRAMs();
+        setecHDDScraperService.scrapeAndSaveHDDs();
+        setecSSDScraperService.scrapeAndSave25InchSSDs();
+        setecM2SSDScraperService.scrapeAndSaveM2SSDs();
+        setecCPUCoolerScraperService.scrapeAndSaveCPUCoolers();
+        setecPcCaseScraperService.scrapeAndSavePcCases();
+        setecPSUScraperService.scrapeAndSavePSUs();
     }
 }

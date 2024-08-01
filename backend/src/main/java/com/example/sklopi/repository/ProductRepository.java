@@ -23,12 +23,4 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     Optional<Product> findByProductUrl(String productUrl);
 
     Page<Product> findAll(Specification<Product> spec, Pageable pageable);
-
-    @Query("SELECT MIN(p.price) FROM Product p JOIN Motherboard m on p.partModel.id=m.id")
-    Double findMinPrice();
-
-    @Query("SELECT MAX(p.price) FROM Product p JOIN Motherboard m on p.partModel.id=m.id")
-    Double findMaxPrice();
-
-
 }

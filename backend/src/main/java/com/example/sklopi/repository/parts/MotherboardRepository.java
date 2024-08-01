@@ -14,6 +14,12 @@ import java.util.Optional;
 public interface MotherboardRepository extends JpaRepository<Motherboard, Long>, MotherboardRepositoryCustom {
     Optional<Motherboard> findByNameAndPart(String name, Part part);
 
+    @Query("SELECT MIN(p.price) FROM Product p JOIN Motherboard m on p.partModel.id=m.id")
+    Double findMinPrice();
+
+    @Query("SELECT MAX(p.price) FROM Product p JOIN Motherboard m on p.partModel.id=m.id")
+    Double findMaxPrice();
+
 
     @Query("SELECT DISTINCT m.formFactor FROM Motherboard m")
     List<String> findDistinctFormFactors();
