@@ -6,9 +6,7 @@ import com.example.sklopi.model.parts.CPUCooler;
 import com.example.sklopi.service.PartService;
 import com.example.sklopi.service.ProductService;
 import com.example.sklopi.service.parts.CPUCoolerService;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -48,6 +46,15 @@ public class AnhochLiquidCoolerScraperService {
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".product-card")));
 
             List<WebElement> coolerElements = driver.findElements(By.cssSelector(".product-card"));
+
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+
+            List<WebElement> gpuElements = driver.findElements(By.cssSelector(".product-card"));
+            Thread.sleep(1000);
+            dismissPopup(driver);
+            Thread.sleep(1000);
+            js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+            Thread.sleep(200);
 
             if (coolerElements.isEmpty()) {
                 System.out.println("No elements found with the selector .product-card");
@@ -99,6 +106,19 @@ public class AnhochLiquidCoolerScraperService {
             e.printStackTrace();
         } finally {
             driver.quit();
+        }
+    }
+
+    private void dismissPopup(WebDriver driver) {
+        try {
+            WebElement popupBanner = driver.findElement(By.cssSelector(".popup-banner-inner"));
+            if (popupBanner.isDisplayed()) {
+                WebElement closeButton = popupBanner.findElement(By.cssSelector("button[data-dismiss='modal']"));
+                closeButton.click();
+                System.out.println("Popup dismissed.");
+            }
+        } catch (NoSuchElementException e) {
+            System.out.println("No popup banner found.");
         }
     }
 
