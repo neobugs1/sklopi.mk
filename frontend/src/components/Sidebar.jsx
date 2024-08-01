@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Box, Heading, Checkbox, VStack, RangeSlider, RangeSliderTrack, RangeSliderFilledTrack, RangeSliderThumb, Text, HStack } from "@chakra-ui/react";
+import { Box, VStack, Heading, Checkbox, Text, RangeSlider, RangeSliderTrack, RangeSliderFilledTrack, RangeSliderThumb, HStack } from "@chakra-ui/react";
 
-const Sidebar = ({ filters, setFilters, minPrice, maxPrice, distinctChipsets, distinctSockets, distinctFormFactors, distinctSupportedMemory }) => {
-  const [priceRange, setPriceRange] = useState([minPrice, maxPrice]);
+const Sidebar = ({ filters, setFilters, distinctFilters, filterConfig }) => {
+  const [priceRange, setPriceRange] = useState([distinctFilters.minPrice, distinctFilters.maxPrice]);
 
   useEffect(() => {
-    setPriceRange([minPrice, maxPrice]);
-  }, [minPrice, maxPrice]);
+    setPriceRange([distinctFilters.minPrice, distinctFilters.maxPrice]);
+  }, [distinctFilters.minPrice, distinctFilters.maxPrice]);
 
   const handleCheckboxChange = (e) => {
     const { name, value, checked } = e.target;
@@ -20,7 +20,7 @@ const Sidebar = ({ filters, setFilters, minPrice, maxPrice, distinctChipsets, di
     setPriceRange(value);
     setFilters((prevFilters) => ({
       ...prevFilters,
-      priceRange: value, // Update the priceRange in filters
+      priceRange: value,
     }));
   };
 
@@ -29,54 +29,29 @@ const Sidebar = ({ filters, setFilters, minPrice, maxPrice, distinctChipsets, di
       <Heading as="h3" color="var(--secondary-color)" size="md" mb="10px">
         Filters
       </Heading>
-
       <VStack spacing={4}>
-        <Box>
-          <Heading as="h4" size="sm">
-            Chipsets
-          </Heading>
-          {distinctChipsets?.map((chipset) => (
-            <Checkbox key={chipset} name="chipset" value={chipset} onChange={handleCheckboxChange}>
-              {chipset}
-            </Checkbox>
-          ))}
-        </Box>
-        <Box>
-          <Heading as="h4" size="sm">
-            Form Factor
-          </Heading>
-          {distinctFormFactors.map((formFactor) => (
-            <Checkbox key={formFactor} name="formFactor" value={formFactor} onChange={handleCheckboxChange}>
-              {formFactor}
-            </Checkbox>
-          ))}
-        </Box>
-
-        <Box>
-          <Heading as="h4" size="sm">
-            Socket
-          </Heading>
-          {distinctSockets.map((socket) => (
-            <Checkbox key={socket} name="socket" value={socket} onChange={handleCheckboxChange}>
-              {socket}
-            </Checkbox>
-          ))}
-        </Box>
-
-        <Box>
-          <Heading as="h4" size="sm">
-            Supported Memory
-          </Heading>
-          {distinctSupportedMemory.map((memory) => (
-            <Checkbox key={memory} name="supportedMemory" value={memory} onChange={handleCheckboxChange}>
-              {memory}
-            </Checkbox>
-          ))}
-        </Box>
-
+        {filterConfig.map(({ key, label }) => (
+          <Box key={key}>
+            <Heading as="h4" size="sm">
+              {label}
+            </Heading>
+            {distinctFilters[`distinct${key[0].toUpperCase() + key.slice(1)}`]?.map((value) => (
+              <Checkbox key={value} name={key} value={value} onChange={handleCheckboxChange}>
+                {value}
+              </Checkbox>
+            ))}
+          </Box>
+        ))}
         <Box>
           <Text mb={2}>Price:</Text>
-          <RangeSlider min={minPrice} max={maxPrice} step={10} value={priceRange} onChange={handlePriceChange} aria-label={["min-price", "max-price"]}>
+          <RangeSlider
+            min={distinctFilters.minPrice}
+            max={distinctFilters.maxPrice}
+            step={10}
+            value={priceRange}
+            onChange={handlePriceChange}
+            aria-label={["min-price", "max-price"]}
+          >
             <RangeSliderTrack>
               <RangeSliderFilledTrack />
             </RangeSliderTrack>

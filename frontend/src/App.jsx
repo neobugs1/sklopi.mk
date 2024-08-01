@@ -6,6 +6,20 @@ import Footer from "./components/Footer";
 import Builder from "./components/Builder";
 import Home from "./components/Home";
 import Motherboards from "./components/Motherboards";
+import DynamicPart from "./components/DynamicPart";
+
+const motherboardFilterConfig = [
+  { key: "name", label: "Chipsets" },
+  { key: "socket", label: "Socket" },
+  { key: "supportedMemory", label: "Supported Memory" },
+  { key: "formFactor", label: "Form Factor" },
+];
+
+const ramFilterConfig = [
+  { key: "name", label: "Type" },
+  { key: "capacity", label: "Size" },
+  { key: "speed", label: "Frequency" },
+];
 
 const App = () => (
   <Box>
@@ -16,10 +30,16 @@ const App = () => (
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route path="/builder" element={<Builder />} />
-          <Route path="/motherboards/products" element={<Motherboards />} />
-          {/* <Route path="/products" element={<div>Browse Products</div>} />
-          <Route path="/builds" element={<div>Completed Builds</div>} />
-          <Route path="/guide" element={<div>Build Guides</div>} /> */}
+          <Route
+            path="/motherboards/products"
+            element={
+              <DynamicPart partType="Motherboards" apiEndpoint="http://localhost:8080/api/products/motherboards" filterConfig={motherboardFilterConfig} />
+            }
+          />
+          <Route
+            path="/ram/products"
+            element={<DynamicPart partType="RAM" apiEndpoint="http://localhost:8080/api/products/ram" filterConfig={ramFilterConfig} />}
+          />
         </Routes>
       </Flex>
     </Flex>

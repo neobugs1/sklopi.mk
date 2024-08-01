@@ -1,15 +1,26 @@
 import React from "react";
 import { Tr, Td, Button } from "@chakra-ui/react";
 
-const ProductItem = ({ product }) => (
+const ProductItem = ({ product, partType }) => (
   <Tr>
     <Td>
       <img src={product.imageUrl} alt={product.name} width="50" height="50" />
     </Td>
     <Td>{product.name}</Td>
-    <Td>{product.partModel.socket}</Td>
-    <Td>{product.partModel.formFactor}</Td>
-    <Td>{product.partModel.supportedMemory}</Td>
+    {partType === "Motherboards" && (
+      <>
+        <Td>{product.partModel.socket}</Td>
+        <Td>{product.partModel.formFactor}</Td>
+        <Td>{product.partModel.supportedMemory}</Td>
+      </>
+    )}
+    {partType === "RAM" && (
+      <>
+        <Td>{product.partModel.name}</Td>
+        <Td>{product.partModel.capacity}</Td>
+        <Td>{product.partModel.frequency}</Td>
+      </>
+    )}
     <Td>{product.price} ден.</Td>
     <Td>
       <Button colorScheme="purple" as="a" href={product.productUrl}>
