@@ -150,17 +150,17 @@ public class AnhochPSUScraperService {
 
     private String determineEfficiencyRating(String productName) {
         if (productName.toLowerCase().contains("titanium")) {
-            return "80+ Titanium";
+            return "Titanium";
         } else if (productName.toLowerCase().contains("platinum")) {
-            return "80+ Platinum";
+            return "Platinum";
         } else if (productName.toLowerCase().contains("gold")) {
-            return "80+ Gold";
+            return "Gold";
         } else if (productName.toLowerCase().contains("silver")) {
-            return "80+ Silver";
+            return "Silver";
         } else if (productName.toLowerCase().contains("bronze")) {
-            return "80+ Bronze";
+            return "Bronze";
         } else if (productName.toLowerCase().contains("black") || productName.toLowerCase().contains("white")) {
-            return "80+";
+            return "No Rating";
         }
         return null;
     }

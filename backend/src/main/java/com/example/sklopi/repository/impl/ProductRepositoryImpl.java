@@ -1,6 +1,7 @@
 package com.example.sklopi.repository.impl;
 
 import com.example.sklopi.model.PartModel;
+import com.example.sklopi.model.parts.PSU;
 import com.example.sklopi.repository.custom.ProductRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -49,7 +50,11 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         // Apply sorting
         if (sortBy != null && !sortBy.isEmpty()) {
-            queryBuilder.append(" ORDER BY p.").append(sortBy);
+            if ("efficiencyRating".equals(sortBy) && partModelType.equals(PSU.class)) {
+                queryBuilder.append(" ORDER BY CASE WHEN pm.efficiencyRating = 'Gold' THEN 1 ELSE 2 END, pm.efficiencyRating ASC");
+            } else {
+                queryBuilder.append(" ORDER BY p.").append(sortBy);
+            }
         }
 
         TypedQuery<Product> query = entityManager.createQuery(queryBuilder.toString(), Product.class);
