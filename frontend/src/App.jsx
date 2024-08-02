@@ -21,6 +21,23 @@ const ramFilterConfig = [
   { key: "speed", label: "Frequency" },
 ];
 
+const caseFilterConfig = [
+  { key: "name", label: "Type" },
+  { key: "formFactor", label: "Size" },
+];
+
+const cpuCoolerFilterConfig = [
+  { key: "name", label: "Type" },
+  { key: "coolerType", label: "Cooler Type" },
+];
+
+const storageFilterConfig = [
+  { key: "name", label: "Type" },
+  { key: "capacity", label: "Size" },
+  { key: "formFactor", label: "FormFactor" },
+  { key: "type", label: "Type" },
+];
+
 const App = () => (
   <Box>
     <Header />
@@ -39,6 +56,18 @@ const App = () => (
           <Route
             path="/ram/products"
             element={<DynamicPart partType="RAM" apiEndpoint="http://localhost:8080/api/products/ram" filterConfig={ramFilterConfig} />}
+          />
+          <Route
+            path="/case/products"
+            element={<DynamicPart partType="Case" apiEndpoint="http://localhost:8080/api/products/cases" filterConfig={caseFilterConfig} />}
+          />
+          <Route
+            path="/cpu-coolers/products"
+            element={<DynamicPart partType="CPU Cooler" apiEndpoint="http://localhost:8080/api/products/cpu-coolers" filterConfig={cpuCoolerFilterConfig} />}
+          />
+          <Route
+            path="/storage/products"
+            element={<DynamicPart partType="Storage" apiEndpoint="http://localhost:8080/api/products/storage" filterConfig={storageFilterConfig} />}
           />
         </Routes>
       </Flex>

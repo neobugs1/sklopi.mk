@@ -44,6 +44,28 @@ const ProductList = ({ filters, apiEndpoint, partType }) => {
             <Th>Frequency</Th>
           </>
         );
+      case "Case":
+        return (
+          <>
+            <Th>Type</Th>
+            <Th>Size</Th>
+          </>
+        );
+      case "CPU Cooler":
+        return (
+          <>
+            <Th>Brand</Th>
+            <Th>Type</Th>
+          </>
+        );
+      case "Storage":
+        return (
+          <>
+            <Th>Brand</Th>
+            <Th>Size</Th>
+            <Th>Form Factor</Th>
+          </>
+        );
       // Add other part types here as needed
       default:
         return null;

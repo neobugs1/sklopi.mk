@@ -21,6 +21,25 @@ const ProductItem = ({ product, partType }) => (
         <Td>{product.partModel.frequency}</Td>
       </>
     )}
+    {partType === "Case" && (
+      <>
+        <Td>{product.partModel.name}</Td>
+        <Td>{product.partModel.formFactor}</Td>
+      </>
+    )}
+    {partType === "CPU Cooler" && (
+      <>
+        <Td>{product.partModel.name}</Td>
+        <Td>{product.partModel.coolerType}</Td>
+      </>
+    )}
+    {partType === "Storage" && (
+      <>
+        <Td>{product.partModel.name}</Td>
+        <Td>{product.partModel.capacity}</Td>
+        <Td>{product.partModel.formFactor}</Td>
+      </>
+    )}
     <Td>{product.price} ден.</Td>
     <Td>
       <Button colorScheme="purple" as="a" href={product.productUrl}>
