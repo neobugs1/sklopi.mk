@@ -2,7 +2,7 @@ package com.example.sklopi.scraping.anhoch;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.Product;
-import com.example.sklopi.model.parts.PcCase;
+import com.example.sklopi.model.parts.PCCase;
 import com.example.sklopi.service.PartService;
 import com.example.sklopi.service.ProductService;
 import com.example.sklopi.service.parts.PcCaseService;
@@ -26,7 +26,7 @@ public class AnhochPcCaseScraperService {
     private PartService partService;
 
     @Autowired
-    private PcCaseService caseService;
+    private PcCaseService pcCaseService;
 
     @Autowired
     private ProductService productService;
@@ -88,7 +88,7 @@ public class AnhochPcCaseScraperService {
                     String formFactor = determineFormFactor(name);
 
                     if (brand != null && formFactor != null) {
-                        Optional<PcCase> partModel = determineAndSavePartModel(name, casePart, brand, formFactor);
+                        Optional<PCCase> partModel = determineAndSavePartModel(name, casePart, brand, formFactor);
 
                         if (partModel.isPresent()) {
                             Product product = new Product();
@@ -157,11 +157,11 @@ public class AnhochPcCaseScraperService {
         }
     }
 
-    private Optional<PcCase> determineAndSavePartModel(String productName, Part casePart, String brand, String formFactor) {
-        return caseService.findByBrandAndFormFactor(brand, formFactor)
+    private Optional<PCCase> determineAndSavePartModel(String productName, Part casePart, String brand, String formFactor) {
+        return pcCaseService.findByBrandAndFormFactor(brand, formFactor)
                 .or(() -> {
-                    PcCase newCase = new PcCase(casePart, brand, formFactor);
-                    return Optional.of(caseService.save(newCase));
+                    PCCase newCase = new PCCase(casePart, brand, formFactor);
+                    return Optional.of(pcCaseService.save(newCase));
                 });
     }
 }

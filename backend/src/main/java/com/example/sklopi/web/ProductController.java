@@ -3,8 +3,7 @@ package com.example.sklopi.web;
 import com.example.sklopi.model.Product;
 import com.example.sklopi.model.parts.*;
 import com.example.sklopi.repository.ProductRepository;
-import com.example.sklopi.repository.parts.MotherboardRepository;
-import com.example.sklopi.repository.parts.RAMRepository;
+import com.example.sklopi.repository.parts.*;
 import com.example.sklopi.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +29,15 @@ public class ProductController {
 
     @Autowired
     private RAMRepository ramRepository;
+
+    @Autowired
+    private CPUCoolerRepository cpuCoolerRepository;
+
+    @Autowired
+    private PcCaseRepository pcCaseRepository;
+
+    @Autowired
+    private StorageRepository storageRepository;
 
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable Long id) {
@@ -101,6 +109,91 @@ public class ProductController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/cases")
+    public ResponseEntity<Map<String, Object>> getCases(
+            @RequestParam(required = false) List<String> name,
+            @RequestParam(required = false) List<String> formFactor,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Map<String, List<String>> attributes = new HashMap<>();
+        attributes.put("formFactor", formFactor);
+
+        Map<String, Object> response = productService.getFilteredProducts(
+                PCCase.class, name, attributes, minPrice, maxPrice, sortBy, pageable);
+
+        response.put("minPrice", pcCaseRepository.findMinPrice());
+        response.put("maxPrice", pcCaseRepository.findMaxPrice());
+
+        response.put("distinctName", pcCaseRepository.findDistinctBrands());
+        response.put("distinctFormFactor", pcCaseRepository.findDistinctFormFactors());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/cpu-coolers")
+    public ResponseEntity<Map<String, Object>> getCpuCoolers(
+            @RequestParam(required = false) List<String> name,
+            @RequestParam(required = false) List<String> coolerType,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Map<String, List<String>> attributes = new HashMap<>();
+        attributes.put("coolerType", coolerType);
+
+        Map<String, Object> response = productService.getFilteredProducts(
+                CPUCooler.class, name, attributes, minPrice, maxPrice, sortBy, pageable);
+
+        response.put("minPrice", cpuCoolerRepository.findMinPrice());
+        response.put("maxPrice", cpuCoolerRepository.findMaxPrice());
+
+        response.put("distinctName", cpuCoolerRepository.findDistinctBrands());
+        response.put("distinctCoolerType", cpuCoolerRepository.findDistinctCoolerTypes());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/storage")
+    public ResponseEntity<Map<String, Object>> getStorage(
+            @RequestParam(required = false) List<String> name,
+            @RequestParam(required = false) List<String> formFactor,
+            @RequestParam(required = false) List<String> capacity,
+            @RequestParam(required = false) List<String> type,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Map<String, List<String>> attributes = new HashMap<>();
+        attributes.put("formFactor", formFactor);
+        attributes.put("capacity", capacity);
+        attributes.put("type", type);
+
+        Map<String, Object> response = productService.getFilteredProducts(
+                Storage.class, name, attributes, minPrice, maxPrice, sortBy, pageable);
+
+        response.put("minPrice", storageRepository.findMinPrice());
+        response.put("maxPrice", storageRepository.findMaxPrice());
+
+        response.put("distinctName", storageRepository.findDistinctBrands());
+        response.put("distinctCapacity", storageRepository.findDistinctCapacities());
+        response.put("distinctFormFactor", storageRepository.findDistinctFormFactor());
+        response.put("distinctType", storageRepository.findDistinctTypes());
+
+        return ResponseEntity.ok(response);
+    }
+
 
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {

@@ -42,7 +42,7 @@ public class ScrapingRunner implements CommandLineRunner {
     @Autowired
     private SetecMotherboardScraperService setecMotherboardScraperService;
     @Autowired
-    private com.example.sklopi.scraping.newwebsite.SetecRAMScraperService setecRAMScraperService;
+    private SetecRAMScraperService setecRAMScraperService;
     @Autowired
     private SetecHDDScraperService setecHDDScraperService;
     @Autowired
@@ -58,28 +58,28 @@ public class ScrapingRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        productService.setAllProductsOutOfStock();
-
-        anhochGPUScraperService.scrapeAndSaveGPUs();
-        anhochCpuScraperService.scrapeAndSaveCPUs();
-        anhochMotherboardScraperService.scrapeAndSaveMotherboards();
-        anhochRamScraperService.scrapeAndSaveRAMs();
-        anhochSsdScraperService.scrapeAndSaveSSDs();
-        anhochHddScraperService.scrapeAndSaveHDDs();
-        anhochAirCoolerScraperService.scrapeAndSaveAirCoolers();
-        anhochLiquidCoolerScraperService.scrapeAndSaveLiquidCoolers();
-        anhochPcCaseScraperService.scrapeAndSaveCases();
-        anhochPsuScraperService.scrapeAndSavePSUs();
-
-        setecGPUScraperService.scrapeAndSaveGPUs();
-        setecCPUScraperService.scrapeAndSaveCPUs();
-        setecMotherboardScraperService.scrapeAndSaveMotherboards();
-        setecRAMScraperService.scrapeAndSaveRAMs();
-        setecHDDScraperService.scrapeAndSaveHDDs();
-        setecSSDScraperService.scrapeAndSave25InchSSDs();
-        setecM2SSDScraperService.scrapeAndSaveM2SSDs();
-        setecCPUCoolerScraperService.scrapeAndSaveCPUCoolers();
-        setecPcCaseScraperService.scrapeAndSavePcCases();
-        setecPSUScraperService.scrapeAndSavePSUs();
+//        productService.setAllProductsOutOfStock();
+//
+//        anhochGPUScraperService.scrapeAndSaveGPUs();
+//        anhochCpuScraperService.scrapeAndSaveCPUs();
+//        anhochMotherboardScraperService.scrapeAndSaveMotherboards();
+//        anhochRamScraperService.scrapeAndSaveRAMs();
+//        anhochSsdScraperService.scrapeAndSaveSSDs();
+//        anhochHddScraperService.scrapeAndSaveHDDs();
+//        anhochAirCoolerScraperService.scrapeAndSaveAirCoolers();
+//        anhochLiquidCoolerScraperService.scrapeAndSaveLiquidCoolers();
+//        anhochPcCaseScraperService.scrapeAndSaveCases();
+//        anhochPsuScraperService.scrapeAndSavePSUs();
+//
+//        setecGPUScraperService.scrapeAndSaveGPUs();
+//        setecCPUScraperService.scrapeAndSaveCPUs();
+//        setecMotherboardScraperService.scrapeAndSaveMotherboards();
+//        setecRAMScraperService.scrapeAndSaveRAMs();
+//        setecHDDScraperService.scrapeAndSaveHDDs();
+//        setecSSDScraperService.scrapeAndSave25InchSSDs();
+//        setecM2SSDScraperService.scrapeAndSaveM2SSDs();
+//        setecCPUCoolerScraperService.scrapeAndSaveCPUCoolers();
+//        setecPcCaseScraperService.scrapeAndSavePcCases();
+//        setecPSUScraperService.scrapeAndSavePSUs();
     }
 }

@@ -1,4 +1,4 @@
-package com.example.sklopi.scraping.newwebsite;
+package com.example.sklopi.scraping.setec;
 
 import com.example.sklopi.model.Part;
 import com.example.sklopi.model.Product;
