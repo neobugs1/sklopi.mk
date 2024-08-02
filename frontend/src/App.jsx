@@ -38,6 +38,12 @@ const storageFilterConfig = [
   { key: "type", label: "Type" },
 ];
 
+const psuFilterConfig = [
+  { key: "name", label: "Type" },
+  { key: "wattage", label: "Wattage" },
+  { key: "efficiencyRating", label: "Efficiency Rating" },
+];
+
 const App = () => (
   <Box>
     <Header />
@@ -68,6 +74,10 @@ const App = () => (
           <Route
             path="/storage/products"
             element={<DynamicPart partType="Storage" apiEndpoint="http://localhost:8080/api/products/storage" filterConfig={storageFilterConfig} />}
+          />
+          <Route
+            path="/psu/products"
+            element={<DynamicPart partType="PSU" apiEndpoint="http://localhost:8080/api/products/psu" filterConfig={psuFilterConfig} />}
           />
         </Routes>
       </Flex>

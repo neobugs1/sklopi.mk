@@ -66,6 +66,13 @@ const ProductList = ({ filters, apiEndpoint, partType }) => {
             <Th>Form Factor</Th>
           </>
         );
+      case "PSU":
+        return (
+          <>
+            <Th>Wattage</Th>
+            <Th>Efficiency Rating</Th>
+          </>
+        );
       // Add other part types here as needed
       default:
         return null;
@@ -82,6 +89,7 @@ const ProductList = ({ filters, apiEndpoint, partType }) => {
           <HStack>
             <Text>Sort by:</Text>
             <Select id="sort" value={sort} onChange={(e) => setSort(e.target.value)}>
+              {partType === "PSU" && <option value="efficiencyRating">Efficiency Rating (80+ Gold first)</option>}
               <option value="price asc">Price (Lowest first)</option>
               <option value="price desc">Price (Highest first)</option>
               <option value="name">Name (A-Z)</option>

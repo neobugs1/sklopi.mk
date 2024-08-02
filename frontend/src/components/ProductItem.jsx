@@ -40,6 +40,12 @@ const ProductItem = ({ product, partType }) => (
         <Td>{product.partModel.formFactor}</Td>
       </>
     )}
+    {partType === "PSU" && (
+      <>
+        <Td>{product.partModel.wattage} W</Td>
+        <Td>80+ {product.partModel.efficiencyRating}</Td>
+      </>
+    )}
     <Td>{product.price} ден.</Td>
     <Td>
       <Button colorScheme="purple" as="a" href={product.productUrl}>
