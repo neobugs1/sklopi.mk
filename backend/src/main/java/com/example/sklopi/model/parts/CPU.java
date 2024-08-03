@@ -20,22 +20,33 @@ import java.util.List;
 public class CPU extends PartModel {
     private String brand;
     private String socket;
-    private int coreClock; // in MHz
-    private int boostClock; // in MHz
-    private boolean integratedGraphics;
-    private boolean includesCooler;
+    private int baseClock;
+    private int boostClock;
+    private int totalCores;
+    private String coreConfiguration; // to support strings like "8P + 16E"
+    private int singleCorePoints;
+    private int multiCorePoints;
+    private boolean hyperthreading;
+    private String generation;
+    private int tdp;
 
     @OneToMany(mappedBy = "partModel")
     private List<Product> products;
 
-    public CPU(String name, Part part, String brand, String socket, int coreClock, int boostClock, boolean integratedGraphics, boolean includesCooler) {
+    public CPU(String name, Part part, String brand, String socket, int baseClock, int boostClock,
+               int totalCores, String coreConfiguration, int singleCorePoints, int multiCorePoints, boolean hyperthreading, String generation, int tdp) {
         super(name, part);
         this.brand = brand;
         this.socket = socket;
-        this.coreClock = coreClock;
+        this.baseClock = baseClock;
         this.boostClock = boostClock;
-        this.integratedGraphics = integratedGraphics;
-        this.includesCooler = includesCooler;
+        this.totalCores = totalCores;
+        this.coreConfiguration = coreConfiguration;
+        this.singleCorePoints = singleCorePoints;
+        this.multiCorePoints = multiCorePoints;
+        this.hyperthreading = hyperthreading;
+        this.generation = generation;
+        this.tdp = tdp;
     }
 }
 
