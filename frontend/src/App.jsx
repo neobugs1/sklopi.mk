@@ -43,6 +43,14 @@ const psuFilterConfig = [
   { key: "wattage", label: "Wattage" },
   { key: "efficiencyRating", label: "Efficiency Rating" },
 ];
+const cpuFilterConfig = [
+  { key: "name", label: "Type" },
+  { key: "brand", label: "Brand" },
+  { key: "totalCores", label: "Total Cores" },
+  { key: "socket", label: "Socket" },
+  { key: "boostClock", label: "Boost Clock" },
+  { key: "tdp", label: "TDP" },
+];
 
 const App = () => (
   <Box>
@@ -77,7 +85,11 @@ const App = () => (
           />
           <Route
             path="/psu/products"
-            element={<DynamicPart partType="PSU" apiEndpoint="http://localhost:8080/api/products/psu" filterConfig={psuFilterConfig} />}
+            element={<DynamicPart partType="PSU" apiEndpoint="http://localhost:8080/api/psus/products" filterConfig={psuFilterConfig} />}
+          />
+          <Route
+            path="/cpu/products"
+            element={<DynamicPart partType="CPU" apiEndpoint="http://localhost:8080/api/cpus/products" filterConfig={cpuFilterConfig} />}
           />
         </Routes>
       </Flex>

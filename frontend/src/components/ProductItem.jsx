@@ -46,6 +46,15 @@ const ProductItem = ({ product, partType }) => (
         <Td>80+ {product.partModel.efficiencyRating}</Td>
       </>
     )}
+    {partType === "CPU" && (
+      <>
+        <Td>{product.partModel.name}</Td>
+        <Td>{product.partModel.brand}</Td>
+        <Td>{product.partModel.socket}</Td>
+        <Td>{product.partModel.boostClock} MHz</Td>
+        <Td>{product.partModel.tdp} W</Td>
+      </>
+    )}
     <Td>{product.price} ден.</Td>
     <Td>
       <Button colorScheme="purple" as="a" href={product.productUrl}>

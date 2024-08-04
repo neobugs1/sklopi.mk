@@ -73,6 +73,16 @@ const ProductList = ({ filters, apiEndpoint, partType }) => {
             <Th>Efficiency Rating</Th>
           </>
         );
+      case "CPU":
+        return (
+          <>
+            <Th>Type</Th>
+            <Th>Brand</Th>
+            <Th>Socket</Th>
+            <Th>Boost Clock</Th>
+            <Th>TDP</Th>
+          </>
+        );
       // Add other part types here as needed
       default:
         return null;
@@ -89,6 +99,8 @@ const ProductList = ({ filters, apiEndpoint, partType }) => {
           <HStack>
             <Text>Sort by:</Text>
             <Select id="sort" value={sort} onChange={(e) => setSort(e.target.value)}>
+              {partType === "CPU" && <option value="singleCoreValue">Value (Single Core)</option>}
+              {partType === "CPU" && <option value="multiCoreValue">Value (Multi Core)</option>}
               {partType === "PSU" && <option value="efficiencyRating">Efficiency Rating (80+ Gold first)</option>}
               <option value="price asc">Price (Lowest first)</option>
               <option value="price desc">Price (Highest first)</option>

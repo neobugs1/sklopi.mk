@@ -35,11 +35,16 @@ const Sidebar = ({ filters, setFilters, distinctFilters, filterConfig }) => {
             <Heading as="h4" size="sm">
               {label}
             </Heading>
-            {distinctFilters[`distinct${key[0].toUpperCase() + key.slice(1)}`]?.map((value) => (
-              <Checkbox key={value} name={key} value={value} onChange={handleCheckboxChange}>
-                {value}
-              </Checkbox>
-            ))}
+            {distinctFilters[`distinct${key[0].toUpperCase() + key.slice(1)}`]?.map(
+              (value) => (
+                console.log(`distinct${key[0].toUpperCase() + key.slice(1)}`),
+                (
+                  <Checkbox key={value} name={key} value={value} onChange={handleCheckboxChange}>
+                    {value}
+                  </Checkbox>
+                )
+              )
+            )}
           </Box>
         ))}
         <Box>
