@@ -197,34 +197,6 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/psu")
-    public ResponseEntity<Map<String, Object>> getPSUs(
-            @RequestParam(required = false) List<String> name,
-            @RequestParam(required = false) List<String> wattage,
-            @RequestParam(required = false) List<String> efficiencyRating,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice,
-            @RequestParam(required = false, defaultValue = "efficiencyRating") String sortBy,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        Map<String, List<String>> attributes = new HashMap<>();
-        attributes.put("wattage", wattage);
-        attributes.put("efficiencyRating", efficiencyRating);
-
-        Map<String, Object> response = productService.getFilteredProducts(
-                PSU.class, name, attributes, minPrice, maxPrice, sortBy, pageable);
-
-        response.put("minPrice", psuRepository.findMinPrice());
-        response.put("maxPrice", psuRepository.findMaxPrice());
-
-        response.put("distinctName", psuRepository.findDistinctBrands());
-        response.put("distinctWattage", psuRepository.findDistinctWattage());
-        response.put("distinctEfficiencyRating", psuRepository.findDistinctEfficiencyRatings());
-
-        return ResponseEntity.ok(response);
-    }
 
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {

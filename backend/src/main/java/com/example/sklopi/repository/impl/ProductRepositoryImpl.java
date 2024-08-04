@@ -1,6 +1,8 @@
 package com.example.sklopi.repository.impl;
 
 import com.example.sklopi.model.PartModel;
+import com.example.sklopi.model.parts.CPU;
+import com.example.sklopi.model.parts.GPU;
 import com.example.sklopi.model.parts.PSU;
 import com.example.sklopi.repository.custom.ProductRepositoryCustom;
 import jakarta.persistence.EntityManager;
@@ -52,6 +54,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         if (sortBy != null && !sortBy.isEmpty()) {
             if ("efficiencyRating".equals(sortBy) && partModelType.equals(PSU.class)) {
                 queryBuilder.append(" ORDER BY CASE WHEN pm.efficiencyRating = 'Gold' THEN 1 ELSE 2 END, pm.efficiencyRating ASC");
+            } else if (sortBy.equals("value") && partModelType.equals(GPU.class)) {
+                queryBuilder.append(" ORDER BY (pm.rasterPerformance / p.price) DESC");
+            } else if (sortBy.equals("singleCoreValue") && partModelType.equals(CPU.class)) {
+                queryBuilder.append(" ORDER BY ((pm.singleCorePoints) / p.price) DESC");
+            } else if (sortBy.equals("multiCoreValue") && partModelType.equals(CPU.class)) {
+                queryBuilder.append(" ORDER BY ((pm.multiCorePoints) / p.price) DESC");
             } else {
                 queryBuilder.append(" ORDER BY p.").append(sortBy);
             }
