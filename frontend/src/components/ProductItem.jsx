@@ -49,6 +49,7 @@ const ProductItem = ({ product, partType }) => (
     {partType === "CPU" && (
       <>
         <Td>{product.partModel.name}</Td>
+        <Td>{product.partModel.totalCores}</Td>
         <Td>{product.partModel.brand}</Td>
         <Td>{product.partModel.socket}</Td>
         <Td>{product.partModel.boostClock} MHz</Td>

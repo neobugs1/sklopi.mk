@@ -14,13 +14,23 @@ const ProductList = ({ filters, apiEndpoint, partType }) => {
   }, [currentPage, sort, filters]);
 
   const fetchProducts = async () => {
-    const response = await fetch(
-      `${apiEndpoint}?page=${currentPage}&size=10&minPrice=${filters.priceRange[0]}&maxPrice=${filters.priceRange[1]}&sortBy=${sort}` +
-        Object.keys(filters)
-          .filter((key) => key !== "priceRange")
-          .map((key) => `&${key}=${filters[key].join(",")}`)
-          .join("")
-    );
+    const queryParams = new URLSearchParams();
+    queryParams.append("page", currentPage);
+    queryParams.append("size", 10);
+    queryParams.append("sortBy", sort);
+    queryParams.append("minPrice", filters.priceRange[0]);
+    queryParams.append("maxPrice", filters.priceRange[1]);
+
+    // Append range filters
+    Object.keys(filters).forEach((key) => {
+      if (Array.isArray(filters[key])) {
+        filters[key].forEach((value) => queryParams.append(key, value));
+      } else if (key.startsWith("min") || key.startsWith("max")) {
+        queryParams.append(key, filters[key]);
+      }
+    });
+
+    const response = await fetch(`${apiEndpoint}?${queryParams.toString()}`);
     const data = await response.json();
     setProducts(data.products);
     setTotalPages(data.totalPages);
@@ -77,6 +87,7 @@ const ProductList = ({ filters, apiEndpoint, partType }) => {
         return (
           <>
             <Th>Type</Th>
+            <Th>Cores</Th>
             <Th>Brand</Th>
             <Th>Socket</Th>
             <Th>Boost Clock</Th>

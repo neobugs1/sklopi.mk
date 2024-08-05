@@ -9,47 +9,47 @@ import Motherboards from "./components/Motherboards";
 import DynamicPart from "./components/DynamicPart";
 
 const motherboardFilterConfig = [
-  { key: "name", label: "Chipsets" },
-  { key: "socket", label: "Socket" },
-  { key: "supportedMemory", label: "Supported Memory" },
-  { key: "formFactor", label: "Form Factor" },
+  { key: "name", label: "Chipsets", type: "checkbox" },
+  { key: "socket", label: "Socket", type: "checkbox" },
+  { key: "supportedMemory", label: "Supported Memory", type: "checkbox" },
+  { key: "formFactor", label: "Form Factor", type: "checkbox" },
 ];
 
 const ramFilterConfig = [
-  { key: "name", label: "Type" },
-  { key: "capacity", label: "Size" },
-  { key: "speed", label: "Frequency" },
+  { key: "name", label: "Type", type: "checkbox" },
+  { key: "capacity", label: "Size", type: "checkbox" },
+  { key: "speed", label: "Frequency", type: "checkbox" },
 ];
 
 const caseFilterConfig = [
-  { key: "name", label: "Type" },
-  { key: "formFactor", label: "Size" },
+  { key: "name", label: "Type", type: "checkbox" },
+  { key: "formFactor", label: "Size", type: "checkbox" },
 ];
 
 const cpuCoolerFilterConfig = [
-  { key: "name", label: "Type" },
-  { key: "coolerType", label: "Cooler Type" },
+  { key: "name", label: "Type", type: "checkbox" },
+  { key: "coolerType", label: "Cooler Type", type: "checkbox" },
 ];
 
 const storageFilterConfig = [
-  { key: "name", label: "Type" },
-  { key: "capacity", label: "Size" },
-  { key: "formFactor", label: "FormFactor" },
-  { key: "type", label: "Type" },
+  { key: "name", label: "Type", type: "checkbox" },
+  { key: "capacity", label: "Size", type: "checkbox" },
+  { key: "formFactor", label: "FormFactor", type: "checkbox" },
+  { key: "type", label: "Type", type: "checkbox" },
 ];
 
 const psuFilterConfig = [
-  { key: "name", label: "Type" },
-  { key: "wattage", label: "Wattage" },
-  { key: "efficiencyRating", label: "Efficiency Rating" },
+  { key: "name", label: "Type", type: "checkbox" },
+  { key: "wattage", label: "Wattage", type: "checkbox" },
+  { key: "efficiencyRating", label: "Efficiency Rating", type: "checkbox" },
 ];
 const cpuFilterConfig = [
-  { key: "name", label: "Type" },
-  { key: "brand", label: "Brand" },
-  { key: "totalCores", label: "Total Cores" },
-  { key: "socket", label: "Socket" },
-  { key: "boostClock", label: "Boost Clock" },
-  { key: "tdp", label: "TDP" },
+  { key: "name", label: "Type", type: "checkbox" },
+  { key: "brand", label: "Brand", type: "checkbox" },
+  { key: "totalCores", label: "Total Cores", type: "range", minKey: "minTotalCores", maxKey: "maxTotalCores" },
+  { key: "socket", label: "Socket", type: "checkbox" },
+  { key: "boostClock", label: "Boost Clock", type: "range", minKey: "minBoostClock", maxKey: "maxBoostClock" },
+  { key: "tdp", label: "TDP", type: "range", minKey: "minTdp", maxKey: "maxTdp" },
 ];
 
 const App = () => (

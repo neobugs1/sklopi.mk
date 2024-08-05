@@ -1,25 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Flex,
-  Box,
-  VStack,
-  HStack,
-  Heading,
-  Checkbox,
-  Text,
-  RangeSlider,
-  RangeSliderTrack,
-  RangeSliderFilledTrack,
-  RangeSliderThumb,
-  Select,
-  Table,
-  Thead,
-  Tr,
-  Th,
-  Tbody,
-} from "@chakra-ui/react";
-import ProductItem from "./ProductItem";
-import Pagination from "./Pagination";
+import { Flex } from "@chakra-ui/react";
 import Sidebar from "./Sidebar";
 import ProductList from "./ProductList";
 
@@ -28,12 +8,27 @@ const DynamicPart = ({ partType, apiEndpoint, filterConfig }) => {
     name: [],
     priceRange: [0, 200000],
     ...filterConfig.reduce((acc, { key }) => ({ ...acc, [key]: [] }), {}),
+    ...filterConfig.reduce((acc, { key, minKey, maxKey }) => {
+      if (minKey && maxKey) {
+        acc[minKey] = 0;
+        acc[maxKey] = 10000000;
+      }
+      return acc;
+    }, {}),
   });
 
   const [distinctFilters, setDistinctFilters] = useState({
     minPrice: 0,
     maxPrice: 10000,
-    ...filterConfig.reduce((acc, { key }) => ({ ...acc, [`distinct${key[0].toUpperCase() + key.slice(1)}`]: [] }), {}),
+    ...filterConfig.reduce(
+      (acc, { key }) => ({
+        ...acc,
+        [`distinct${key[0].toUpperCase() + key.slice(1)}`]: [],
+        [`min${key[0].toUpperCase() + key.slice(1)}`]: 0,
+        [`max${key[0].toUpperCase() + key.slice(1)}`]: 0,
+      }),
+      {}
+    ),
   });
 
   useEffect(() => {
@@ -47,7 +42,12 @@ const DynamicPart = ({ partType, apiEndpoint, filterConfig }) => {
       minPrice: data.minPrice,
       maxPrice: data.maxPrice,
       ...filterConfig.reduce(
-        (acc, { key }) => ({ ...acc, [`distinct${key[0].toUpperCase() + key.slice(1)}`]: data[`distinct${key[0].toUpperCase() + key.slice(1)}`] || [] }),
+        (acc, { key }) => ({
+          ...acc,
+          [`distinct${key[0].toUpperCase() + key.slice(1)}`]: data[`distinct${key[0].toUpperCase() + key.slice(1)}`] || [],
+          [`min${key[0].toUpperCase() + key.slice(1)}`]: data[`min${key[0].toUpperCase() + key.slice(1)}`] || 0,
+          [`max${key[0].toUpperCase() + key.slice(1)}`]: data[`max${key[0].toUpperCase() + key.slice(1)}`] || 0,
+        }),
         {}
       ),
     });

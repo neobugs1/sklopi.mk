@@ -40,6 +40,12 @@ public class CPUController {
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
             @RequestParam(required = false, defaultValue = "price") String sortBy,
+            @RequestParam(required = false) Integer minTotalCores,
+            @RequestParam(required = false) Integer maxTotalCores,
+            @RequestParam(required = false) Double minBoostClock,
+            @RequestParam(required = false) Double maxBoostClock,
+            @RequestParam(required = false) Integer minTdp,
+            @RequestParam(required = false) Integer maxTdp,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
@@ -52,11 +58,20 @@ public class CPUController {
         attributes.put("tdp", tdp);
         attributes.put("hyperthreading", hyperthreading);
 
-        Map<String, Object> response = productService.getFilteredProducts(
-                CPU.class, name, attributes, minPrice, maxPrice, sortBy, pageable);
+        Map<String, Object> response = cpuService.getFilteredProducts(
+                CPU.class, name, attributes, minPrice, maxPrice, minTotalCores, maxTotalCores, minBoostClock, maxBoostClock, minTdp, maxTdp, sortBy, pageable);
 
         response.put("minPrice", cpuRepository.findMinPrice());
         response.put("maxPrice", cpuRepository.findMaxPrice());
+
+        response.put("minTotalCores", cpuRepository.findMinTotalCores());
+        response.put("maxTotalCores", cpuRepository.findMaxTotalCores());
+
+        response.put("minBoostClock", cpuRepository.findMinBoostClock());
+        response.put("maxBoostClock", cpuRepository.findMaxBoostClock());
+
+        response.put("minTdp", cpuRepository.findMinTdp());
+        response.put("maxTdp", cpuRepository.findMaxTdp());
 
         response.put("distinctName", cpuRepository.findDistinctNames());
         response.put("distinctBrand", cpuRepository.findDistinctBrands());
@@ -68,4 +83,6 @@ public class CPUController {
 
         return ResponseEntity.ok(response);
     }
+
+
 }
