@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 public class GPU extends PartModel {
     private String brand; // NVIDIA / AMD / Intel
-    private String memorySize; // in GB
+    private int memorySize; // in GB
     private String memoryType;
     private int coreClock; // in MHz
     private int boostClock; // in MHz
@@ -29,7 +29,7 @@ public class GPU extends PartModel {
     @OneToMany(mappedBy = "partModel")
     private List<Product> products;
 
-    public GPU(String name, Part part, String brand, String memorySize, String memoryType, int coreClock, int boostClock, int tdp, int performanceScore) {
+    public GPU(String name, Part part, String brand, int memorySize, String memoryType, int coreClock, int boostClock, int tdp, int performanceScore) {
         super(name, part);
         this.brand = brand;
         this.memorySize = memorySize;
