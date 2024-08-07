@@ -1,5 +1,7 @@
 import React from "react";
-import { Tr, Td, Button } from "@chakra-ui/react";
+import { Tr, Td, Button, Image, Link } from "@chakra-ui/react";
+import anhoch from "../assets/lUuXIR1al8ZZVSTbX4e7Rryi6jgaymSLQGsDYjkT.svg";
+import setec from "../assets/setec-belo-logo.png";
 
 const ProductItem = ({ product, partType }) => (
   <Tr>
@@ -56,9 +58,30 @@ const ProductItem = ({ product, partType }) => (
         <Td>{product.partModel.tdp} W</Td>
       </>
     )}
+    {partType === "GPU" && (
+      <>
+        <Td>{product.partModel.name}</Td>
+        <Td>{product.partModel.brand}</Td>
+        <Td>{product.partModel.memorySize} GB</Td>
+        <Td>{parseInt(product.partModel.performanceScore) / parseInt(product.price)}</Td>
+      </>
+    )}
+
+    <Td>
+      {/* product url contains setec? */}
+      {product.productUrl.includes("setec") ? (
+        <Link href={product.productUrl} bg="transparent">
+          <Image src={setec} />
+        </Link>
+      ) : (
+        <Link href={product.productUrl} bg="transparent">
+          <Image src={anhoch} />
+        </Link>
+      )}
+    </Td>
     <Td>{product.price} ден.</Td>
     <Td>
-      <Button colorScheme="purple" as="a" href={product.productUrl}>
+      <Button colorScheme="purple" as="a">
         Додади
       </Button>
     </Td>

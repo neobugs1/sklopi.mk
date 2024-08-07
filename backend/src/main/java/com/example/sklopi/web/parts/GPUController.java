@@ -30,7 +30,7 @@ public class GPUController {
             @RequestParam(required = false) List<String> memorySize,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
-            @RequestParam(required = false, defaultValue = "price") String sortBy,
+            @RequestParam(required = false, defaultValue = "performanceValue") String sortBy,
             @RequestParam(required = false) Integer minMemorySize,
             @RequestParam(required = false) Integer maxMemorySize,
             @RequestParam(defaultValue = "0") int page,

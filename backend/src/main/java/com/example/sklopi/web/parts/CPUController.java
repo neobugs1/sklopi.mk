@@ -39,7 +39,7 @@ public class CPUController {
             @RequestParam(required = false) List<String> hyperthreading,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
-            @RequestParam(required = false, defaultValue = "price") String sortBy,
+            @RequestParam(required = false, defaultValue = "singleCoreValue") String sortBy,
             @RequestParam(required = false) Integer minTotalCores,
             @RequestParam(required = false) Integer maxTotalCores,
             @RequestParam(required = false) Double minBoostClock,

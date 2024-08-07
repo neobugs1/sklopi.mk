@@ -4,10 +4,20 @@ import ProductItem from "./ProductItem";
 import Pagination from "./Pagination";
 
 const ProductList = ({ filters, apiEndpoint, partType }) => {
+  const getDefaultSort = (partType) => {
+    if (partType === "GPU") {
+      return "performanceValue";
+    } else if (partType === "CPU") {
+      return "singleCoreValue";
+    } else {
+      return "price";
+    }
+  };
+
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [sort, setSort] = useState("price");
+  const [sort, setSort] = useState(getDefaultSort(partType));
 
   useEffect(() => {
     fetchProducts();
@@ -94,6 +104,15 @@ const ProductList = ({ filters, apiEndpoint, partType }) => {
             <Th>TDP</Th>
           </>
         );
+      case "GPU":
+        return (
+          <>
+            <Th>Name</Th>
+            <Th>Brand</Th>
+            <Th>Memory</Th>
+            <Th>VALUE</Th>
+          </>
+        );
       // Add other part types here as needed
       default:
         return null;
@@ -110,6 +129,7 @@ const ProductList = ({ filters, apiEndpoint, partType }) => {
           <HStack>
             <Text>Sort by:</Text>
             <Select id="sort" value={sort} onChange={(e) => setSort(e.target.value)}>
+              {partType === "GPU" && <option value="performanceValue">Value</option>}
               {partType === "CPU" && <option value="singleCoreValue">Value (Single Core)</option>}
               {partType === "CPU" && <option value="multiCoreValue">Value (Multi Core)</option>}
               {partType === "PSU" && <option value="efficiencyRating">Efficiency Rating (80+ Gold first)</option>}
@@ -125,6 +145,7 @@ const ProductList = ({ filters, apiEndpoint, partType }) => {
               <Th></Th>
               <Th>Name</Th>
               {getHeaders()}
+              <Th>Продавач</Th>
               <Th>Price</Th>
               <Th></Th>
             </Tr>

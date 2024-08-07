@@ -14,6 +14,9 @@ import java.util.Optional;
 public interface GPURepository extends JpaRepository<GPU, Long>, GPURepositoryCustom {
     Optional<GPU> findByNameAndPart(String name, Part part);
 
+    Optional<GPU> findByNameAndPartAndMemorySize(String name, Part part, int memorySize);
+
+
     @Query("SELECT MIN(p.price) FROM Product p JOIN GPU pm ON p.partModel.id=pm.id")
     Double findMinPrice();
 

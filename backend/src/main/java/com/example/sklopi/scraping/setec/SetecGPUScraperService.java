@@ -116,7 +116,7 @@ public class SetecGPUScraperService {
 
                         if (name.contains("-")) {
                             String extractedModel = extractGpuModel(name);
-                            Optional<GPU> partModelOptional = determinePartModel(extractedModel, gpuPart);
+                            Optional<GPU> partModelOptional = determinePartModel(extractedModel, name, gpuPart);
 
                             if (partModelOptional.isPresent()) {
                                 GPU partModel = partModelOptional.get();
@@ -153,7 +153,7 @@ public class SetecGPUScraperService {
         String cleanName = name.toUpperCase().replaceAll("[^A-Z0-9]", " ");
 
         // REGEX za graficki
-        Pattern pattern = Pattern.compile("(RTX|GTX|RX)\\s*(\\d{3,4})(TI)?(S)?(XT|XTX|GRE)?");
+        Pattern pattern = Pattern.compile("(RTX|GTX|RX)\\s*(\\d{3,4})(TI)?(S)?(XTX|XT|GRE)?");
         Matcher matcher = pattern.matcher(cleanName);
 
         if (matcher.find()) {
@@ -183,16 +183,29 @@ public class SetecGPUScraperService {
         return null;
     }
 
-    private Optional<GPU> determinePartModel(String extractedModel, Part gpuPart) {
+    private Optional<GPU> determinePartModel(String extractedModel, String productName, Part gpuPart) {
         List<GPU> partModels = gpuService.findAll();
 
         partModels.sort(Comparator.comparingInt((GPU model) -> model.getName().length()).reversed());
 
+        int memorySize = extractMemorySize(productName);
+
         for (GPU model : partModels) {
-            if (extractedModel.equals(model.getName())) {
+            if (extractedModel.equals(model.getName()) && model.getMemorySize() == memorySize) {
                 return Optional.of(model);
             }
         }
         return Optional.empty();
     }
+
+    private int extractMemorySize(String productName) {
+        // Regular expression to find memory size (e.g., 8G, 16GB, 16 GB)
+        Pattern pattern = Pattern.compile("(?<![\\d-])(\\d+)[Gg](?![\\d\\w])");
+        Matcher matcher = pattern.matcher(productName.toUpperCase().replaceAll("[^A-Z0-9]", " "));
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group(1));
+        }
+        return -1;
+    }
+
 }

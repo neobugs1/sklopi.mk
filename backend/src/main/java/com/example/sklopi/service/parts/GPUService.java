@@ -25,6 +25,11 @@ public class GPUService {
         return gpuRepository.findByNameAndPart(name, part);
     }
 
+    public Optional<GPU> findByNamePartAndMemorySize(String name, Part part, int memorySize) {
+        return gpuRepository.findByNameAndPartAndMemorySize(name, part, memorySize);
+    }
+
+
     public GPU save(GPU gpu) {
         return gpuRepository.save(gpu);
     }

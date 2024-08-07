@@ -80,9 +80,9 @@ public class CPURepositoryImpl implements CPURepositoryCustom {
         // Apply sorting
         if (sortBy != null && !sortBy.isEmpty()) {
             if (sortBy.equals("singleCoreValue") && partModelType.equals(CPU.class)) {
-                queryBuilder.append(" ORDER BY ((pm.singleCorePoints) / p.price) DESC");
+                queryBuilder.append(" ORDER BY (CAST(pm.singleCorePoints AS float)  / CAST(p.price AS float)) DESC");
             } else if (sortBy.equals("multiCoreValue") && partModelType.equals(CPU.class)) {
-                queryBuilder.append(" ORDER BY ((pm.multiCorePoints) / p.price) DESC");
+                queryBuilder.append(" ORDER BY (CAST(pm.multiCorePoints AS float)  / CAST(p.price AS float)) DESC");
             } else {
                 queryBuilder.append(" ORDER BY p.").append(sortBy);
             }

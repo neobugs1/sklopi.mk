@@ -19,6 +19,8 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class AnhochGPUScraperService {
@@ -122,11 +124,24 @@ public class AnhochGPUScraperService {
         // sort, opagjacki redosled bidejki ima slicni iminja, najprvin treba podolgite da gi pomineme
         partModels.sort(Comparator.comparingInt((GPU model) -> model.getName().length()).reversed());
 
+        // Extract memory size from the product name
+        int memorySize = extractMemorySize(productName);
+
         for (GPU model : partModels) {
-            if (productName.contains(model.getName())) {
+            if (productName.contains(model.getName()) && model.getMemorySize() == memorySize) {
                 return Optional.of(model);
             }
         }
         return Optional.empty();
+    }
+
+    private int extractMemorySize(String productName) {
+        // Regular expression to find memory size (e.g., 8GB, 16GB)
+        Pattern pattern = Pattern.compile("(\\d+)G");
+        Matcher matcher = pattern.matcher(productName);
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group(1));
+        }
+        return -1;
     }
 }

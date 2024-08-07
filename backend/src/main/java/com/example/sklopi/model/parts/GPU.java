@@ -25,11 +25,12 @@ public class GPU extends PartModel {
     private int boostClock; // in MHz
     private int tdp; // in Watts
     private int performanceScore;
+    private String generation;
 
     @OneToMany(mappedBy = "partModel")
     private List<Product> products;
 
-    public GPU(String name, Part part, String brand, int memorySize, String memoryType, int coreClock, int boostClock, int tdp, int performanceScore) {
+    public GPU(String name, Part part, String brand, int memorySize, String memoryType, int coreClock, int boostClock, int tdp, int performanceScore, String generation) {
         super(name, part);
         this.brand = brand;
         this.memorySize = memorySize;
@@ -38,5 +39,6 @@ public class GPU extends PartModel {
         this.boostClock = boostClock;
         this.tdp = tdp;
         this.performanceScore = performanceScore;
+        this.generation = generation;
     }
 }

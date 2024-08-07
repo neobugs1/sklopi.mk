@@ -51,6 +51,11 @@ const cpuFilterConfig = [
   { key: "boostClock", label: "Boost Clock", type: "range", minKey: "minBoostClock", maxKey: "maxBoostClock" },
   { key: "tdp", label: "TDP", type: "range", minKey: "minTdp", maxKey: "maxTdp" },
 ];
+const gpuFilterConfig = [
+  { key: "name", label: "Name", type: "checkbox" },
+  { key: "brand", label: "Brand", type: "checkbox" },
+  { key: "memorySize", label: "VRAM", type: "range", minKey: "minMemorySize", maxKey: "maxMemorySize" },
+];
 
 const App = () => (
   <Box>
@@ -90,6 +95,10 @@ const App = () => (
           <Route
             path="/cpu/products"
             element={<DynamicPart partType="CPU" apiEndpoint="http://localhost:8080/api/cpus/products" filterConfig={cpuFilterConfig} />}
+          />
+          <Route
+            path="/gpu/products"
+            element={<DynamicPart partType="GPU" apiEndpoint="http://localhost:8080/api/gpus/products" filterConfig={gpuFilterConfig} />}
           />
         </Routes>
       </Flex>
