@@ -71,7 +71,7 @@ public class ScrapingRunner implements CommandLineRunner {
 //        anhochPcCaseScraperService.scrapeAndSaveCases();
 //        anhochPsuScraperService.scrapeAndSavePSUs();
 
-        setecGPUScraperService.scrapeAndSaveGPUs();
+//        setecGPUScraperService.scrapeAndSaveGPUs();
 //        setecCPUScraperService.scrapeAndSaveCPUs();
 //        setecMotherboardScraperService.scrapeAndSaveMotherboards();
 //        setecRAMScraperService.scrapeAndSaveRAMs();
