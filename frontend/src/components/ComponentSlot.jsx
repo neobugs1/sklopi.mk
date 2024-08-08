@@ -19,7 +19,7 @@ const ComponentSlot = ({ label, position, product }) => (
     _hover={{ bg: "purple.400", transform: "scale(1.05)" }}
     {...position}
   >
-    {product ? <Image src={product.imageUrl} alt={label} boxSize="100%" objectFit="contain" /> : label}
+    {product ? <Image referrerPolicy="no-referrer" src={product.imageUrl} alt={label} boxSize="100%" objectFit="contain" /> : label}
   </Box>
 );
 

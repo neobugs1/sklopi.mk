@@ -14,7 +14,7 @@ const ProductItem = ({ product, partType }) => {
   return (
     <Tr>
       <Td>
-        <img src={product.imageUrl} alt={product.name} width="50" height="50" />
+        <img src={product.imageUrl} alt={product.name} referrerPolicy="no-referrer" />
       </Td>
       <Td>{product.name}</Td>
       {/* Conditionally render part-specific columns */}
