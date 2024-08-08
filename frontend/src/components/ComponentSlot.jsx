@@ -1,6 +1,6 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Image } from "@chakra-ui/react";
 
-const ComponentSlot = ({ label, position }) => (
+const ComponentSlot = ({ label, position, product }) => (
   <Box
     width="80px"
     height="80px"
@@ -19,7 +19,7 @@ const ComponentSlot = ({ label, position }) => (
     _hover={{ bg: "purple.400", transform: "scale(1.05)" }}
     {...position}
   >
-    {label}
+    {product ? <Image src={product.imageUrl} alt={label} boxSize="100%" objectFit="contain" /> : label}
   </Box>
 );
 
